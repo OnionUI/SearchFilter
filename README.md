@@ -2,6 +2,9 @@
 
 This is currently only working with Onion, because it's manipulating the *_cache2.db files inside your ROM folders.
 
+## Installation
+Copy the contents of the [release zip](https://github.com/Aemiii91/miyoomini-FilterROMs/releases) to the root of your SD card.
+
 ## Usage
 - Open "Filter" app and apply a filter keyword.
 - The app applies the filter and tells you how much was found.
@@ -11,5 +14,3 @@ This is currently only working with Onion, because it's manipulating the *_cache
 ## Quirks
 - When a cache has been manipulated, it's sometimes necessary to scroll a bit to see all list items.
 - Another way to clear the filters, is just to refresh the ROM list.
-
-Any feedback is very welcome!
