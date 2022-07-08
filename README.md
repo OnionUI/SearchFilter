@@ -14,5 +14,3 @@ Copy the contents of the [release zip](https://github.com/Aemiii91/miyoomini-Fil
 ## Quirks
 - When a cache has been manipulated, it's sometimes necessary to scroll a bit to see all list items.
 - Another way to clear the filters, is just to refresh the ROM list.
-
-Any feedback is very welcome!
