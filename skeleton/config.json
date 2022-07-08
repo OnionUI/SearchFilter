@@ -1,0 +1,7 @@
+{
+"label":"Filter",
+"icon":"icon.png",
+"iconsel":"icon.png",
+"launch":"launch.sh",
+"description":"Apply filter to ROM lists"
+}
