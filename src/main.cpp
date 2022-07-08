@@ -1,3 +1,7 @@
+#if !defined(VERSION)
+#define VERSION "0.1-alpha"
+#endif
+
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
@@ -74,8 +78,13 @@ map<string, int> prompt_keyword(Display* display, string* keyword)
     return counts;
 };
 
-int main(int argc, char *args[])
+int main(int argc, char *argv[])
 {
+    if (argc >= 2 && std::string(argv[1]) == "--version") {
+        std::cout << VERSION;
+        exit(0);
+    }
+
     Display* display = new Display();
     string keyword = getFile(ACTIVE_KEYWORD);
     map<string, int>* counts = new map<string, int>();
@@ -147,14 +156,15 @@ int main(int argc, char *args[])
             display->centerText("Press A to edit or X to clear", {320, 120});
 
             if (!counts->empty()) {
+                bool has_missing = false;
                 int total = 0;
                 vector<string> lines;
                 stringstream ss;
 
                 auto addItem = [display, &lines, &ss](string name, int count) {
-                    string curr = name + ": " + std::to_string(count);
+                    string curr = count == -1 ? name + "*" : name + ": " + std::to_string(count);
 
-                    if (display->textWidth(ss.str() + curr) > 360) {
+                    if (display->textWidth(ss.str() + curr) > 600) {
                         lines.push_back(ss.str());
                         ss.str("");
                     }
@@ -166,9 +176,12 @@ int main(int argc, char *args[])
                 };
 
                 for (auto &item : *counts) {
-                    if (item.second == -1)
+                    if (item.second > 0)
+                        total += item.second;
+                    else if (!has_missing && item.second == -1)
+                        has_missing = true;
+                    else if (item.second == -2)
                         continue;
-                    total += item.second;
                     addItem(item.first, item.second);
                 }
 
@@ -182,6 +195,9 @@ int main(int argc, char *args[])
                     display->centerText(line, {320, 210 + offset});
                     offset += 40;
                 }
+
+                if (has_missing)
+                    display->text("*Not cached", {20, 380}, NULL, {160, 80, 80});
             }
 
             legend_on.render();

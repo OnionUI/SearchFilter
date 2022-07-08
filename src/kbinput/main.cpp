@@ -1,3 +1,7 @@
+#if !defined(VERSION)
+#define VERSION "0.1-alpha"
+#endif
+
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -9,6 +13,11 @@
 
 int main(int argc, char** argv)
 {
+    if (argc >= 2 && std::string(argv[1]) == "--version") {
+        std::cout << VERSION;
+        exit(0);
+    }
+
     std::string initial_value = "";
     std::string title = "";
 

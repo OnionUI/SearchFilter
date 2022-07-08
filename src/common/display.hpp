@@ -130,8 +130,10 @@ public:
     void blit(SDL_Surface* src, Rect srcrect, Rect dstrect);
     Rect text(std::string value, Rect* dstrect, TTF_Font* font = NULL, SDL_Color* color = NULL, int center = CENTER_NONE);
     Rect text(std::string value, Rect dstrect, TTF_Font* font = NULL, SDL_Color* color = NULL, int center = CENTER_NONE);
+    Rect text(std::string value, Rect dstrect, TTF_Font* font, SDL_Color color, int center = CENTER_NONE);
     Rect centerText(std::string value, Rect* dstrect, TTF_Font* font = NULL, SDL_Color* color = NULL);
     Rect centerText(std::string value, Rect dstrect, TTF_Font* font = NULL, SDL_Color* color = NULL);
+    Rect centerText(std::string value, Rect dstrect, TTF_Font* font, SDL_Color color);
     int textWidth(std::string value, TTF_Font* font = NULL);
     int textHeight(std::string value, TTF_Font* font = NULL);
     void clear(void);
@@ -257,8 +259,10 @@ Rect Display::text(std::string value, Rect* dstrect, TTF_Font* font, SDL_Color* 
     return srcrect;
 }
 Rect Display::text(std::string value, Rect dstrect, TTF_Font* font, SDL_Color* color, int center) { return text(value, &dstrect, font, color, center); }
+Rect Display::text(std::string value, Rect dstrect, TTF_Font* font, SDL_Color color, int center) { return text(value, &dstrect, font, &color, center); }
 Rect Display::centerText(std::string value, Rect* dstrect, TTF_Font* font, SDL_Color* color) { return text(value, dstrect, font, color, CENTER_BOTH); }
 Rect Display::centerText(std::string value, Rect dstrect, TTF_Font* font, SDL_Color* color) { return text(value, &dstrect, font, color, CENTER_BOTH); }
+Rect Display::centerText(std::string value, Rect dstrect, TTF_Font* font, SDL_Color color) { return text(value, &dstrect, font, &color, CENTER_BOTH); }
 
 int Display::textWidth(std::string value, TTF_Font* font)
 {

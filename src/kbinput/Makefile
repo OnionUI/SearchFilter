@@ -2,6 +2,7 @@
 .PHONY: clean
 
 TARGET=kbinput
+VERSION=1.2
 	
 ###########################################################
 
@@ -16,7 +17,7 @@ endif
 ###########################################################
 
 CC = $(CROSS_COMPILE)g++
-CFLAGS = -I../common -DPLATFORM_$(shell echo $(PLATFORM) | tr a-z A-Z)
+CFLAGS = -I../common -DVERSION=\"$(VERSION)\" -DPLATFORM_$(shell echo $(PLATFORM) | tr a-z A-Z)
 LDFLAGS = -s -lSDL -lSDL_image -lSDL_ttf -lrt
 OPTM=-O3
 

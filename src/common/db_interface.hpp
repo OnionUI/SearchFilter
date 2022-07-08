@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <string>
 #include <sstream>
-#include <functional>
 #include <algorithm>
 #include <map>
 #include <sqlite3/sqlite3.h>
@@ -11,27 +10,28 @@
 
 using std::string;
 using std::stringstream;
-using std::function;
 using std::map;
 
 #define ROMS_PATH "/mnt/SDCARD/Roms"
-#define IGNORE_HIDDEN_FILES 1
+#define ROM_PATH(name) ROMS_PATH "/" + name
+#define CACHE_PATH(name) ROM_PATH(name) + "/" + name + "_cache2.db"
 
-int db_filterEntries(string name, string keyword)
+int db_filterEntries(string db_path, string name, string keyword = "")
 {
     int count = 0;
     sqlite3* db;
     sqlite3_stmt* stmt;
 
-    string filename = ROMS_PATH "/" + name + "/" + name + "_cache2.db";
     string table = name + "_roms";
 
     stringstream query, subquery;
     bool first = true;
     char *ptr;
     char* str = (char*)keyword.c_str();
-    ptr = strtok(str, " ");
+
     subquery << sqlite3_mprintf("SELECT id FROM %Q WHERE", table.c_str());
+    // Split the keywords at every ' ' (space)
+    ptr = strtok(str, " ");
     while (ptr) {
         if (!first)
             subquery << " AND";
@@ -39,28 +39,34 @@ int db_filterEntries(string name, string keyword)
         ptr = strtok(NULL, " ");
         first = false;
     }
+    
+    // Insert the subquery into the filter query
     query << sqlite3_mprintf("DELETE FROM %Q WHERE id NOT IN (%s);", table.c_str(), subquery.str().c_str());
     subquery << ";";
 
-    //get link to database object
-    if (sqlite3_open(filename.c_str(), &db) != SQLITE_OK) {
-        std::cerr << "ERROR: can't open database: " << sqlite3_errmsg(db) << std::endl;
+    // Open the database file
+    if (sqlite3_open(db_path.c_str(), &db) != SQLITE_OK) {
+        std::cerr << "ERROR: can't open database: " << sqlite3_errmsg(db) << " [" << db_path << "]" << std::endl;
         sqlite3_close(db);
         return -1;
     }
 
-    // compile sql statement to binary
-    if(sqlite3_prepare_v2(db, query.str().c_str(), -1, &stmt, NULL) != SQLITE_OK) {
-        std::cerr << "ERROR: while compiling sql: " << sqlite3_errmsg(db) << std::endl;
-        sqlite3_close(db);
-        sqlite3_finalize(stmt);
-        return -1;
+    int ret_code;
+
+    if (keyword.length() > 0) {
+        // Prepare filter query
+        if(sqlite3_prepare_v2(db, query.str().c_str(), -1, &stmt, NULL) != SQLITE_OK) {
+            std::cerr << "ERROR: while compiling sql: " << sqlite3_errmsg(db) << std::endl;
+            sqlite3_close(db);
+            sqlite3_finalize(stmt);
+            return -1;
+        }
+
+        // Execute query
+        int ret_code = sqlite3_step(stmt);
     }
 
-    // execute sql statement, and step through rows
-    int ret_code = sqlite3_step(stmt);
-
-    // compile sql statement to binary
+    // Prepare row count query
     if(sqlite3_prepare_v2(db, sqlite3_mprintf("SELECT count(*) FROM %Q;", table.c_str()), -1, &stmt, NULL) != SQLITE_OK) {
         std::cerr << "ERROR: while compiling sql: " << sqlite3_errmsg(db) << std::endl;
         sqlite3_close(db);
@@ -68,6 +74,7 @@ int db_filterEntries(string name, string keyword)
         return -1;
     }
 
+    // Execute row count query
     while ((ret_code = sqlite3_step(stmt)) == SQLITE_ROW) {
         count = sqlite3_column_int(stmt, 0);
     }
@@ -84,41 +91,27 @@ int db_filterEntries(string name, string keyword)
     return count;
 }
 
-map<string, int> db_applyToAll(function<int(string)> callback) {
-    map<string, int> counts = map<string, int>();
-    DIR* dirFile = opendir(ROMS_PATH);
-
-    if (!dirFile)
-        return counts;
-
-    struct dirent* item;
-    errno = 0;
-
-    while ((item = readdir(dirFile)) != NULL) {
-        string name(item->d_name);
-
-        if (item->d_type != DT_DIR) continue;
-        if (name == "." || name == "..") continue;
-
-        // in linux hidden files all start with '.'
-        if (IGNORE_HIDDEN_FILES && (name[0] == '.')) continue;
-
-        counts[name] = callback(name);
-    }
-
-    closedir(dirFile);
-    return counts;
-}
-
 void db_clearAll()
 {
-    db_applyToAll([](string name) {
-        string db_path = ROMS_PATH "/" + name + "/" + name + "_cache2.db";
+    subdirForEach(ROMS_PATH, [](string name) {
+        string db_path = CACHE_PATH(name);
         string backup_path = db_path + ".backup";
-        if (!exists(backup_path))
+
+        // If cache does not exist, remove backup and exit
+        if (!exists(db_path)) {
+            if (exists(backup_path))
+                remove(backup_path.c_str());
             return -1;
+        }
+
+        // If no backup is found, do nothing
+        if (!exists(backup_path) || db_filterEntries(backup_path, name) <= 0)
+            return -1;
+        
+        // Restore the cache from backup
         remove(db_path.c_str());
         rename(backup_path.c_str(), db_path.c_str());
+
         return -1;
     });
 }
@@ -127,11 +120,20 @@ map<string, int> db_filterAll(string keyword)
 {
     db_clearAll();
 
-    return db_applyToAll([keyword](string name) {
-        string db_path = ROMS_PATH "/" + name + "/" + name + "_cache2.db";
+    return subdirForEach(ROMS_PATH, [keyword](string name) {
+        string rom_path = ROM_PATH(name);
+        string db_path = CACHE_PATH(name);
         string backup_path = db_path + ".backup";
-        if (!exists(backup_path))
+
+        // If cache isn't found, we can't filter it
+        if (!exists(db_path))
+            return dirEmpty(rom_path) ? -2 : -1;
+
+        // Create backup of cache (if not empty)
+        if (!exists(backup_path) && db_filterEntries(db_path, name) > 0)
             copyFile(db_path, backup_path);
-        return db_filterEntries(name, keyword);
+
+        // Filter the cache db and return count
+        return db_filterEntries(db_path, name, keyword);
     });
 }
