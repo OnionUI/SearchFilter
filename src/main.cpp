@@ -1,5 +1,5 @@
 #if !defined(VERSION)
-#define VERSION "0.1-alpha"
+#define VERSION ""
 #endif
 
 #include <iostream>

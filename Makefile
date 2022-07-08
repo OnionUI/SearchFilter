@@ -2,7 +2,7 @@
 .PHONY: clean
 
 TARGET=filter_roms
-VERSION=1.2
+VERSION=1.2.1
 RELEASE_NAME=FilterROMs-$(VERSION)
 	
 ###########################################################

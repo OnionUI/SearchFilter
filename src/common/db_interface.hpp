@@ -24,7 +24,8 @@ int db_filterEntries(string db_path, string name, string keyword = "")
 
     string table = name + "_roms";
 
-    stringstream query, subquery;
+    string sql;
+    stringstream query, subquery, subquery2;
     bool first = true;
     char *ptr;
     char* str = (char*)keyword.c_str();
@@ -39,10 +40,13 @@ int db_filterEntries(string db_path, string name, string keyword = "")
         ptr = strtok(NULL, " ");
         first = false;
     }
+
+    sql = "SELECT id, path AS _path FROM %Q WHERE type=1 AND EXISTS (SELECT id FROM %Q WHERE path LIKE _path || '%%' AND id IN (%s))";
+    subquery2 << sqlite3_mprintf(sql.c_str(), table.c_str(), table.c_str(), subquery.str().c_str());
     
     // Insert the subquery into the filter query
-    query << sqlite3_mprintf("DELETE FROM %Q WHERE id NOT IN (%s);", table.c_str(), subquery.str().c_str());
-    subquery << ";";
+    sql = "DELETE FROM %Q WHERE type=0 AND id NOT IN (%s) OR type=1 AND id NOT IN (SELECT id FROM (%s))";
+    query << sqlite3_mprintf(sql.c_str(), table.c_str(), subquery.str().c_str(), subquery2.str().c_str()) << ";";
 
     // Open the database file
     if (sqlite3_open(db_path.c_str(), &db) != SQLITE_OK) {
@@ -67,7 +71,7 @@ int db_filterEntries(string db_path, string name, string keyword = "")
     }
 
     // Prepare row count query
-    if(sqlite3_prepare_v2(db, sqlite3_mprintf("SELECT count(*) FROM %Q;", table.c_str()), -1, &stmt, NULL) != SQLITE_OK) {
+    if(sqlite3_prepare_v2(db, sqlite3_mprintf("SELECT count(*) FROM %Q WHERE type=0;", table.c_str()), -1, &stmt, NULL) != SQLITE_OK) {
         std::cerr << "ERROR: while compiling sql: " << sqlite3_errmsg(db) << std::endl;
         sqlite3_close(db);
         sqlite3_finalize(stmt);
