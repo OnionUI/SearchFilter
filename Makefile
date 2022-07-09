@@ -2,8 +2,9 @@
 .PHONY: clean
 
 TARGET=filter_roms
-VERSION=1.2.1
-RELEASE_NAME=FilterROMs-$(VERSION)
+VERSION=1.2.2
+RELEASE_NAME=SearchFilter-$(VERSION)
+BUILD_DIR := $(shell pwd -P)/build/App/SearchFilter
 	
 ###########################################################
 
@@ -17,27 +18,23 @@ endif
 
 ###########################################################
 
-CC = $(CROSS_COMPILE)g++
-CFLAGS = -Isrc -Iinclude -DVERSION=\"$(VERSION)\" -DPLATFORM_$(shell echo $(PLATFORM) | tr a-z A-Z)
-LDFLAGS = -s -lSDL -lSDL_image -lSDL_ttf -lrt -lz -lm -lsqlite3
-OPTM=-O3
+all: setup main
 
-all: setup main zip
+release: clean setup main zip
 
 setup:
 	mkdir -p ./build
-	mkdir -p ./release
 
 main:
+	@echo BUILD_DIR $(BUILD_DIR)
 	cp -R ./skeleton/. ./build
-	$(CC) -o build/$(TARGET) src/main.cpp $(CFLAGS) $(LDFLAGS) $(OPTM) -ldl -rdynamic
-	cd ./src/kbinput && make
+	cd ./src/filter && BUILD_DIR=$(BUILD_DIR) VERSION=$(VERSION) make
+	cd ./src/search && BUILD_DIR=$(BUILD_DIR) VERSION=$(VERSION) make
+	cd ./src/kbinput && BUILD_DIR=$(BUILD_DIR) VERSION=$(VERSION) make
 
 zip:
-	mkdir -p ./release/PAYLOAD/App/FilterROMs
-	cp -R ./build/. ./release/PAYLOAD/App/FilterROMs
-	cd ./release/PAYLOAD && zip -r ../$(RELEASE_NAME).zip App
-	rm -rf ./release/PAYLOAD
+	mkdir -p ./release
+	cd ./build && zip -r ../release/$(RELEASE_NAME).zip App Emu
 
 clean:
 	rm -rf ./build

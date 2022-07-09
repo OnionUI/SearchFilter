@@ -13,13 +13,13 @@ using std::string;
 using std::map;
 using std::vector;
 
-#include "common/display.hpp"
-#include "common/resource.hpp"
-#include "common/legend.hpp"
-#include "common/keymap.hpp"
-#include "common/sysutils.hpp"
-#include "common/db_interface.hpp"
-#include "kbinput/keyboard.hpp"
+#include "../common/display.hpp"
+#include "../common/resource.hpp"
+#include "../common/legend.hpp"
+#include "../common/keymap.hpp"
+#include "../common/sysutils.hpp"
+#include "../common/db_interface.hpp"
+#include "../kbinput/keyboard.hpp"
 
 #define ACTIVE_KEYWORD "active_keyword"
 

@@ -1,8 +1,8 @@
 .PHONY: build
 .PHONY: clean
 
-TARGET=kbinput
-
+TARGET=filter
+	
 ###########################################################
 
 ifeq (,$(BUILD_DIR))
@@ -20,8 +20,8 @@ endif
 ###########################################################
 
 CC = $(CROSS_COMPILE)g++
-CFLAGS = -I../common -DVERSION=\"$(VERSION)\" -DPLATFORM_$(shell echo $(PLATFORM) | tr a-z A-Z)
-LDFLAGS = -s -lSDL -lSDL_image -lSDL_ttf -lrt
+CFLAGS = -I../../include -I../common -DVERSION=\"$(VERSION)\" -DPLATFORM_$(shell echo $(PLATFORM) | tr a-z A-Z)
+LDFLAGS = -s -lSDL -lSDL_image -lSDL_ttf -lrt -lz -lm -lsqlite3
 OPTM=-O3
 
 build:
