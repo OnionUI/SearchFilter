@@ -2,7 +2,7 @@
 #define HPP_KEYBOARD
 
 #include <string>
-#include <map>
+using std::string;
 
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
@@ -42,7 +42,7 @@ class Keyboard
 {
 private:
     Display* display;
-    std::string initial_value = "";
+    string initial_value = "";
 
     int current_layer = 0;
     int selected_x = 0;
@@ -103,8 +103,8 @@ private:
     Legend legend;
 
     void drawKey(char c, int selected, Rect keyrect);
-    void drawLabel(std::string label, Rect* keyrect);
-    void drawIcon(SDL_Surface* icon, std::string alt_label, Rect* keyrect);
+    void drawLabel(string label, Rect* keyrect);
+    void drawIcon(SDL_Surface* icon, string alt_label, Rect* keyrect);
     void drawHotkey(SDL_Surface* icon, Rect* keyrect);
     int spaceSelected(void);
     int okSelected(void);
@@ -114,9 +114,9 @@ private:
 
 public:
     bool cancelled = false;
-    std::string title = "";
+    string title = "";
 
-    Keyboard(Display* _display, std::string _value, std::string _title)
+    Keyboard(Display* _display, string _value, string _title)
         : display(_display), initial_value(_value), title(_title)
     {
         input = InputField(display, _value);
@@ -134,9 +134,37 @@ public:
     };
 
     void render(void);
-    std::string getValue(void) { return input.value; };
+    string getValue(void) { return input.value; };
     bool handleKeyPress(SDLKey key, Uint8 type, int repeating);
 };
+
+int kbinput(Display* display, string title, string value, string* output)
+{
+    bool quit = false;
+    Keyboard* kb = new Keyboard(display, value, title);
+
+    auto input_handler = [&kb](SDLKey key, Uint8 type, int repeating) {
+        return kb->handleKeyPress(key, type, repeating);
+    };
+
+    auto frame_handler = [display, input_handler](void) {
+        return display->onInputEvent(input_handler);
+    };
+    
+    while (!quit) {
+        quit = display->requestFrame(frame_handler);
+    }
+
+    bool cancelled = kb->cancelled;
+
+    if (!cancelled)
+        value = kb->getValue();
+
+    delete kb;
+
+    *output = value;
+    return cancelled;
+}
 
 void Keyboard::render()
 {
@@ -233,13 +261,13 @@ void Keyboard::drawKey(char c, int selected, Rect keyrect)
     }
 }
 
-void Keyboard::drawLabel(std::string label, Rect* keyrect)
+void Keyboard::drawLabel(string label, Rect* keyrect)
 {
     TTF_Font* font = label.length() == 1 ? display->fonts.label : display->fonts.regular;
     display->centerText(label, {keyrect->getCenterX(), keyrect->getCenterY()}, font, &display->COLOR_LABEL);
 }
 
-void Keyboard::drawIcon(SDL_Surface* icon, std::string alt_label, Rect* keyrect)
+void Keyboard::drawIcon(SDL_Surface* icon, string alt_label, Rect* keyrect)
 {
     if (!icon)
         return drawLabel(alt_label, keyrect);

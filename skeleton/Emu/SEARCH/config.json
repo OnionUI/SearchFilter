@@ -1,5 +1,5 @@
 {
-"label":"- Search -",
+"label":" Search ",
 "icon":"../../App/SearchFilter/res/icon_search_p.png",
 "iconsel":"",
 "launch":"../../App/SearchFilter/launch.sh",

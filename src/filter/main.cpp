@@ -23,34 +23,6 @@ using std::vector;
 
 #define ACTIVE_KEYWORD "active_keyword"
 
-int kbinput(Display* display, string title, string value, string* output)
-{
-    bool quit = false;
-    Keyboard* kb = new Keyboard(display, value, title);
-
-    auto input_handler = [&kb](SDLKey key, Uint8 type, int repeating) {
-        return kb->handleKeyPress(key, type, repeating);
-    };
-
-    auto frame_handler = [display, input_handler](void) {
-        return display->onInputEvent(input_handler);
-    };
-    
-    while (!quit) {
-        quit = display->requestFrame(frame_handler);
-    }
-
-    bool cancelled = kb->cancelled;
-
-    if (!cancelled)
-        value = kb->getValue();
-
-    delete kb;
-
-    *output = value;
-    return cancelled;
-}
-
 map<string, int> prompt_keyword(Display* display, string* keyword, bool* quit)
 {
     map<string, int> counts;

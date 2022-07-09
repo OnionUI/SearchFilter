@@ -83,34 +83,6 @@ int exec(string command, string* stdout)
     return WEXITSTATUS(pclose(pipe));
 }
 
-map<string, int> subdirForEach(string path, function<int(string)> callback) {
-    map<string, int> values = map<string, int>();
-    DIR* dirFile = opendir(path.c_str());
-
-    if (!dirFile)
-        return values;
-
-    struct dirent* item;
-    errno = 0;
-
-    while ((item = readdir(dirFile)) != NULL) {
-        string name(item->d_name);
-
-        // Skip files
-        if (item->d_type != DT_DIR) continue;
-        // Skip navigation dirs
-        if (name == "." || name == "..") continue;
-
-        // Ignore hidden directories
-        if (IGNORE_HIDDEN_FILES && (name[0] == '.')) continue;
-
-        values[name] = callback(name);
-    }
-
-    closedir(dirFile);
-    return values;
-}
-
 bool dirEmpty(string path) {
     DIR* dirFile = opendir(path.c_str());
 
@@ -135,6 +107,38 @@ bool dirEmpty(string path) {
 
     closedir(dirFile);
     return true;
+}
+
+template<typename T>
+map<string, T> subdirForEach(string path, function<T(string)> callback) {
+    map<string, T> values;
+    DIR* dirFile = opendir(path.c_str());
+
+    if (!dirFile)
+        return values;
+
+    struct dirent* item;
+    errno = 0;
+
+    while ((item = readdir(dirFile)) != NULL) {
+        string name(item->d_name);
+
+        // Skip files
+        if (item->d_type != DT_DIR) continue;
+        // Skip navigation dirs
+        if (name == "." || name == "..") continue;
+
+        // Ignore hidden directories
+        if (IGNORE_HIDDEN_FILES && (name[0] == '.')) continue;
+
+        // Ignore empty directories
+        if (dirEmpty(path + "/" + name)) continue;
+
+        values[name] = callback(name);
+    }
+
+    closedir(dirFile);
+    return values;
 }
 
 #endif // SYSUTILS_HPP__
