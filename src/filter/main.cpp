@@ -51,7 +51,7 @@ int kbinput(Display* display, string title, string value, string* output)
     return cancelled;
 }
 
-map<string, int> prompt_keyword(Display* display, string* keyword)
+map<string, int> prompt_keyword(Display* display, string* keyword, bool* quit)
 {
     map<string, int> counts;
     string prev_keyword = *keyword;
@@ -73,7 +73,7 @@ map<string, int> prompt_keyword(Display* display, string* keyword)
     }
 
     if (ec != 0 && length == 0)
-        exit(0);
+        *quit = true;
 
     return counts;
 };
@@ -96,15 +96,16 @@ int main(int argc, char *argv[])
         counts->swap(_counts);
     };
 
+    bool quit = false;
+    bool changed = true;
+
     if (keyword.length() == 0) {
-        updateCounts(prompt_keyword(display, &keyword));
+        updateCounts(prompt_keyword(display, &keyword, &quit));
     }
     else {
         updateCounts(db_filterAll(keyword));
     }
 
-    bool quit = false;
-    bool changed = true;
 
     ResourceMap res = loadResources({
         {RES_BUTTON_A},
@@ -123,14 +124,14 @@ int main(int argc, char *argv[])
         {res[RES_BUTTON_X], "Clear", "X"}
     });
 
-    auto input_handler = [display, updateCounts, &changed, &keyword](SDLKey key, Uint8 type, int repeating) {
+    auto input_handler = [display, updateCounts, &changed, &keyword, &quit](SDLKey key, Uint8 type, int repeating) {
         if (type != SDL_KEYUP)
             return false;
 
         switch (key)
         {
         case BUTTON_A:
-            updateCounts(prompt_keyword(display, &keyword));
+            updateCounts(prompt_keyword(display, &keyword, &quit));
             changed = true;
             break;
         case BUTTON_X:

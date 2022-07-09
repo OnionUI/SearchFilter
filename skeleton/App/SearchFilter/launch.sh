@@ -3,11 +3,14 @@ echo $0 $*
 progdir=`dirname "$0"`
 
 cd $progdir
-echo $0 $* > debug.log
+echo "$(date):" $0 $* >> debug.log
 
-HOME=$progdir LD_LIBRARY_PATH="$progdir:$LD_LIBRARY_PATH" ./filter_roms 2>&1 >> debug.log
-
-# Restart if return_code is 42
-while [ $? -eq 42 ]; do
-    HOME=$progdir LD_LIBRARY_PATH="$progdir:$LD_LIBRARY_PATH" ./filter_roms 2>&1 >> debug.log
-done
+if [ "$1" == "" ]
+then
+    LD_LIBRARY_PATH="$progdir/lib:$LD_LIBRARY_PATH" ./filter 2>&1 >> debug.log
+elif [ "$(basename "$1")" == "Enter keyword....txt" ]
+then
+    LD_LIBRARY_PATH="$progdir/lib:$LD_LIBRARY_PATH" ./search 2>&1 >> debug.log
+else
+    "${@:2}"
+fi
