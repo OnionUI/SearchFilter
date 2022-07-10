@@ -2,7 +2,7 @@
 .PHONY: clean
 
 TARGET=filter_roms
-VERSION=1.2.2
+VERSION=1.0
 RELEASE_NAME=SearchFilter-$(VERSION)
 BUILD_DIR := $(shell pwd -P)/build/App/SearchFilter
 	
