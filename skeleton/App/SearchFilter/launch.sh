@@ -8,9 +8,14 @@ echo "$(date):" $0 $* >> debug.log
 if [ "$1" == "" ]
 then
     LD_LIBRARY_PATH="$progdir/lib:$LD_LIBRARY_PATH" ./filter 2>&1 >> debug.log
-elif [ "$(basename "$1")" == "Search....txt" ]
+elif [ "$1" == "clear" ]
+then
+    LD_LIBRARY_PATH="$progdir/lib:$LD_LIBRARY_PATH" ./search clear 2>&1 >> debug.log
+elif [ "$1" == "search" ] || [ "$(basename "$1")" == "Enter search term....txt" ]
 then
     LD_LIBRARY_PATH="$progdir/lib:$LD_LIBRARY_PATH" ./search 2>&1 >> debug.log
 else
-    "${@:2}"
+    echo "$(date):" "eval" "$1" >> debug.log
+    cd /mnt/SDCARD/RetroArch
+    eval $1
 fi

@@ -18,6 +18,53 @@ using std::function;
 
 #define IGNORE_HIDDEN_FILES 1
 
+int exec(string command, string* stdout)
+{
+    char buffer[128];
+    *stdout = "";
+
+    FILE* pipe = popen(command.c_str(), "r");
+    if (!pipe) {
+        std::cerr << "popen failed!" << std::endl;
+        exit(-1);
+    }
+
+    while (!feof(pipe)) {
+        if (fgets(buffer, 128, pipe) != NULL)
+            *stdout += buffer;
+    }
+
+    int last = stdout->length() - 1;
+    if (last >= 0 && stdout->at(last) == '\n')
+        stdout->erase(last);
+
+    return WEXITSTATUS(pclose(pipe));
+}
+
+string dirname(string path)
+{
+    int pos = path.find_last_of("/");
+    return pos == -1 ? "" : path.substr(0, pos);
+}
+
+string basename(string path)
+{
+    return path.substr(path.find_last_of("/") + 1);
+}
+
+string fullpath(string root, string rel = "")
+{
+    string fullpath = "";
+    string cmd;
+    if (rel.length() > 0)
+        cmd = "cd '" + root + "' >/dev/null 2>&1 && cd '" + rel + "' >/dev/null 2>&1 && pwd -P";
+    else
+        cmd = "cd '" + root + "' >/dev/null 2>&1 && pwd -P";
+    if (exec(cmd, &fullpath))
+        return "";
+    return fullpath;
+}
+
 bool exists(string file_path)
 {
     return access(file_path.c_str(), F_OK) == 0;
@@ -60,29 +107,6 @@ void putFile(string file_path, string contents)
     }
 }
 
-int exec(string command, string* stdout)
-{
-    char buffer[128];
-    *stdout = "";
-
-    FILE* pipe = popen(command.c_str(), "r");
-    if (!pipe) {
-        std::cerr << "popen failed!" << std::endl;
-        exit(-1);
-    }
-
-    while (!feof(pipe)) {
-        if (fgets(buffer, 128, pipe) != NULL)
-            *stdout += buffer;
-    }
-
-    int last = stdout->length() - 1;
-    if (last >= 0 && stdout->at(last) == '\n')
-        stdout->erase(last);
-
-    return WEXITSTATUS(pclose(pipe));
-}
-
 bool dirEmpty(string path) {
     DIR* dirFile = opendir(path.c_str());
 
@@ -109,13 +133,11 @@ bool dirEmpty(string path) {
     return true;
 }
 
-template<typename T>
-map<string, T> subdirForEach(string path, function<T(string)> callback) {
-    map<string, T> values;
+void subdirForEach(string path, function<void(string)> callback) {
     DIR* dirFile = opendir(path.c_str());
 
     if (!dirFile)
-        return values;
+        return;
 
     struct dirent* item;
     errno = 0;
@@ -134,11 +156,10 @@ map<string, T> subdirForEach(string path, function<T(string)> callback) {
         // Ignore empty directories
         if (dirEmpty(path + "/" + name)) continue;
 
-        values[name] = callback(name);
+        callback(name);
     }
 
     closedir(dirFile);
-    return values;
 }
 
 #endif // SYSUTILS_HPP__

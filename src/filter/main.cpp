@@ -18,7 +18,7 @@ using std::vector;
 #include "../common/legend.hpp"
 #include "../common/keymap.hpp"
 #include "../common/sysutils.hpp"
-#include "../common/db_interface.hpp"
+#include "../common/db_cache.hpp"
 #include "../kbinput/keyboard.hpp"
 
 #define ACTIVE_KEYWORD "active_keyword"
@@ -39,7 +39,7 @@ map<string, int> prompt_keyword(Display* display, string* keyword, bool* quit)
             display->clear();
             display->centerText("Please wait...", {320, 240});
             display->flip();
-            counts = db_filterAll(temp_keyword);
+            counts = db::filterAll(temp_keyword);
             putFile(ACTIVE_KEYWORD, temp_keyword);
         }
     }
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
         updateCounts(prompt_keyword(display, &keyword, &quit));
     }
     else {
-        updateCounts(db_filterAll(keyword));
+        updateCounts(db::filterAll(keyword));
     }
 
 
@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
         display->flip();
 
         if (keyword.length() == 0) {
-            db_clearAll();
+            db::clearAll();
             remove(ACTIVE_KEYWORD);
         }
 

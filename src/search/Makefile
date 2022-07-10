@@ -25,6 +25,6 @@ LDFLAGS = -s -lSDL -lSDL_image -lSDL_ttf -lrt -lz -lm -lsqlite3
 OPTM=-O3
 
 build:
-	$(CC) -o $(BUILD_DIR)/$(TARGET) main.cpp $(CFLAGS) $(LDFLAGS) $(OPTM) -ldl -rdynamic
+	$(CC) -o $(BUILD_DIR)/$(TARGET) main.cpp ../../include/jsoncpp.cpp $(CFLAGS) $(LDFLAGS) $(OPTM) -ldl -rdynamic
 clean:
 	rm -f $(BUILD_DIR)/$(TARGET)
