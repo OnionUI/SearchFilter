@@ -6,7 +6,7 @@ This app adds *Search* to the *Consoles* section of OnionOS and a *Filter* app u
 :-:|:-:|:-:|:-:|:-:
 
 ## Installation
-Copy the contents of the [release zip](https://github.com/Aemiii91/miyoomini-FilterROMs/releases) to the root of your SD card.
+Copy the contents of the [zip file](https://github.com/Aemiii91/miyoomini-SearchFilter/releases) to the root of your SD card.
 
 ## Usage
 
@@ -15,9 +15,9 @@ Copy the contents of the [release zip](https://github.com/Aemiii91/miyoomini-Fil
 - Go to the *Consoles* section and choose *Search*.
 - Press <kbd>A</kbd> again to enter a search term.
 - Choose OK or press <kbd>START</kbd> to initiate the search.
-- The results are divided by console.
-- Press <kbd>▲</kbd>, (when on the first entry) to go to the search actions.
-- Choose the `[Search: '...']` option to edit the search term, or clear the search with the corresponding option.
+- The results can be viewed in a single list with all results or several lists grouped by console.
+- Press <kbd>▲</kbd> (when on the first entry) to go to the search actions.
+- Here you can clear the search or choose the `[Search: '...']` option to edit the search term.
 
 **Note:** When the roms are refreshed, the console lists will no longer be cached, and will not be included in the search. To include them, just visit the given console list and it will be scanned and cached.
 
