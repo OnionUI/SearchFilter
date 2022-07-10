@@ -156,7 +156,7 @@ int main(int argc, char** argv)
     if (argc >= 2 && std::string(argv[1]) == "clear")
         keyword = "";
     else
-        ec = kbinput(display, "Search:", keyword, &keyword);
+        ec = kbinput(display, "Enter search term:", keyword, &keyword);
 
     if (ec == 0) {
         if (keyword.length() > 0) {

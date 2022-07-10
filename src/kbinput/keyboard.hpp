@@ -379,15 +379,15 @@ bool Keyboard::handleKeyPress(SDLKey key, Uint8 type, int repeating)
 {
     int changed = 0;
 
-    // Cancel if MENU or cancel is pressed
-    if (key == BUTTON_MENU || key == HOTKEY_CANCEL) {
-        input.value = initial_value;
-        cancelled = true;
-        return true;
-    }
-
     if (type == SDL_KEYUP) {
         last_keyup_time = SDL_GetTicks();
+
+        // Cancel if MENU or cancel is pressed
+        if (key == BUTTON_MENU || key == HOTKEY_CANCEL) {
+            input.value = initial_value;
+            cancelled = true;
+            return true;
+        }
 
         if (key == BUTTON_L2 && break_shift) {
             break_shift = 0;
