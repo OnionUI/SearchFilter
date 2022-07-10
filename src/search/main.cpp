@@ -48,7 +48,7 @@ void performSearch(Display* display, string keyword)
 
     if (keyword.length() == 0) {
         db::insertRom(db, db_name, {
-            .disp = "Enter search term...",
+            .disp = "[Enter search term...]",
             .path = "search",
             .imgpath = db_dir + "/../res/icon_search_field.png"
         });
@@ -76,8 +76,8 @@ void performSearch(Display* display, string keyword)
             db::insertRom(db, db_name, {
                 .disp = config.label + " (Not cached)",
                 .path = rom_path,
-                .imgpath = rom_path,
-                .type = 1
+                .imgpath = db_dir + "/../res/icon_unavailable.png",
+                .type = 0
             });
             continue;
         }
@@ -116,13 +116,13 @@ void performSearch(Display* display, string keyword)
     flipText(display, "Searching... " + std::to_string(total_emu) + "/" + std::to_string(total_emu));
 
     db::insertRom(db, db_name, {
-        .disp = "Clear search",
+        .disp = "[Clear search]",
         .path = "clear",
-        .imgpath = db_dir + "/../res/icon_close.png"
+        .imgpath = db_dir + "/../res/icon_clear_search.png"
     });
 
     db::insertRom(db, db_name, {
-        .disp = "Search: '" + keyword + "'",
+        .disp = "[Search: '" + keyword + "']",
         .path = "search",
         .imgpath = db_dir + "/../res/icon_search_field.png"
     });

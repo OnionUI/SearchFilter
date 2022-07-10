@@ -11,7 +11,7 @@ then
 elif [ "$1" == "clear" ]
 then
     LD_LIBRARY_PATH="$progdir/lib:$LD_LIBRARY_PATH" ./search clear 2>&1 >> debug.log
-elif [ "$1" == "search" ] || [ "$(basename "$1")" == "Enter search term....txt" ]
+elif [ "$1" == "search" ] || [ "$(basename "$1")" == "[Enter search term...].txt" ]
 then
     LD_LIBRARY_PATH="$progdir/lib:$LD_LIBRARY_PATH" ./search 2>&1 >> debug.log
 else
