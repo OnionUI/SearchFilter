@@ -6,7 +6,7 @@ This app adds *Search* to the *Consoles* section of OnionOS and a *Filter* app u
 :-:|:-:|:-:|:-:|:-:
 
 ## Installation
-Copy the contents of the [zip file](releases) to the root of your SD card.
+Copy the contents of the [zip file](https://github.com/Aemiii91/miyoomini-SearchFilter/releases) to the root of your SD card.
 
 ## Usage
 
