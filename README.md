@@ -16,7 +16,7 @@ Copy the contents of the [release zip](https://github.com/Aemiii91/miyoomini-Fil
 - Press <kbd>A</kbd> again to enter a search term.
 - Choose OK or press <kbd>START</kbd> to initiate the search.
 - The results are divided by console.
-- Press <kbd>▲</kbd>, (when on the first entry) to go to the search actions.
+- Press <kbd>▲</kbd> (when on the first entry) to go to the search actions.
 - Choose the `[Search: '...']` option to edit the search term, or clear the search with the corresponding option.
 
 **Note:** When the roms are refreshed, the console lists will no longer be cached, and will not be included in the search. To include them, just visit the given console list and it will be scanned and cached.
