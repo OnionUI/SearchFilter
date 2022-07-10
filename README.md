@@ -1,4 +1,4 @@
-# <img src="skeleton/App/SearchFilter/res/icon_search.png?raw=true" width="24"> Search & Filter for OnionOS
+# <img src="skeleton/App/SearchFilter/res/icon_search.png?raw=true" width="24"> Search / <img src="skeleton/App/SearchFilter/res/icon_filter.png?raw=true" width="24"> Filter for OnionOS
 
 This app adds *Search* to the *Consoles* section of OnionOS and a *Filter* app under *Apps*.
 
