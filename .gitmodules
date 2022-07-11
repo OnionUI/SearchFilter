@@ -1,0 +1,3 @@
+[submodule "include/sqlite3"]
+	path = include/sqlite3
+	url = https://github.com/Aemiii91/miyoomini-sqlite3.git
