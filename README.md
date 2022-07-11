@@ -4,7 +4,7 @@ This app adds *Search* to the *Consoles* section of OnionOS and a *Filter* app u
 
 ## Search
 
-<img title="Consoles section" src="screenshots/1.png?raw=true" width="150px"> <img title="Initial screen" src="screenshots/2.png?raw=true" width="150px"> <img title="Tools" src="screenshots/3.png?raw=true" width="150px"> <img title="Enter search term" src="screenshots/4.png?raw=true" width="150px"> <img title="Results" src="screenshots/5.png?raw=true" width="150px"> <img title="Edit or clear search" src="screenshots/6.png?raw=true" width="150px">
+<img title="Consoles section" src="screenshots/001.png?raw=true" width="150px"> <img title="Initial screen" src="screenshots/002.png?raw=true" width="150px"> <img title="Tools" src="screenshots/003.png?raw=true" width="150px"> <img title="Enter search term" src="screenshots/004.png?raw=true" width="150px"> <img title="Results" src="screenshots/005.png?raw=true" width="150px"> <img title="Edit or clear search" src="screenshots/006.png?raw=true" width="150px">
 
 - Go to the *Consoles* section and choose *Search*.
 - Press <kbd>A</kbd> again to enter a search term.
