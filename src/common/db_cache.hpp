@@ -16,6 +16,8 @@ using std::stringstream;
 using std::map;
 using std::vector;
 
+#include "sysutils.hpp"
+
 #define ROMS_PATH "/mnt/SDCARD/Roms"
 #define ROM_PATH(name) ROMS_PATH "/" + name
 #define CACHE_NAME(name) name + "_cache2.db"
@@ -37,23 +39,26 @@ struct RomEntry
 
 namespace db {
     namespace sql {
-        string search(string table, string keyword)
+        string search(string table, const string &keyword_str)
         {
             string sql;
             stringstream query;
+            vector<string> keywords = split(keyword_str, " ");
+
+            query << sqlite3_mprintf("SELECT * FROM %Q", table.c_str());
+
             bool first = true;
-            char *ptr;
-            char* str = (char*)keyword.c_str();
+            int count = keywords.size();
 
-            query << sqlite3_mprintf("SELECT * FROM %Q WHERE", table.c_str());
+            for (int i = 0; i < count; i++) {
+                string keyword = trim(keywords[i]);
 
-            // Split the keywords at every ' ' (space)
-            ptr = strtok(str, " ");
-            while (ptr) {
-                if (!first)
-                    query << " AND";
-                query << sqlite3_mprintf(" disp LIKE '%%%q%%'", ptr);
-                ptr = strtok(NULL, " ");
+                if (keyword.length() == 0)
+                    continue;
+
+                query << (first ? " WHERE" : " AND");
+                query << sqlite3_mprintf(" disp LIKE '%%%q%%'", keyword.c_str());
+
                 first = false;
             }
 
@@ -109,6 +114,20 @@ namespace db {
                 entry.imgpath.c_str(),
                 std::to_string(entry.type).c_str(),
                 entry.ppath.c_str()
+            ));
+        }
+
+        string dupChangePpath(string name, string ppath)
+        {
+            string sql =
+                "INSERT INTO %Q (disp, path, imgpath, type, ppath) "
+                "SELECT disp, path, imgpath, type, %Q FROM %Q WHERE type=0;";
+            string table = TABLE_NAME(name);
+            return string(sqlite3_mprintf(
+                sql.c_str(),
+                table.c_str(),
+                ppath.c_str(),
+                table.c_str()
             ));
         }
     }
@@ -193,6 +212,23 @@ namespace db {
 
         // Create roms table
         if(!prepare(db, &stmt, sql::insert(name, entry)))
+            return false;
+        rc = sqlite3_step(stmt);
+        
+        if (!isDone(db, rc))
+            return false;
+
+        sqlite3_finalize(stmt);
+        return true;
+    }
+
+    bool duplicateResults(sqlite3* db, string name, string ppath)
+    {
+        int rc;
+        sqlite3_stmt* stmt;
+
+        // Create roms table
+        if(!prepare(db, &stmt, sql::dupChangePpath(name, ppath)))
             return false;
         rc = sqlite3_step(stmt);
         

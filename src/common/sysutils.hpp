@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
 #include <map>
 #include <functional>
 #include <unistd.h>
@@ -13,6 +14,7 @@ using std::ifstream;
 using std::ofstream;
 using std::ios;
 using std::string;
+using std::vector;
 using std::map;
 using std::function;
 
@@ -41,31 +43,60 @@ int exec(string command, string* stdout)
     return WEXITSTATUS(pclose(pipe));
 }
 
-string replaceAll(string value, string x, string y)
+vector<string> split(const string &s, string delim)
 {
-    string s = "";
+    vector<string> tokens;
     char *ptr;
-    char* str = (char*)value.c_str();
-    const char* f = x.c_str();
+    char* str = (char*)s.c_str();
+    const char* f = delim.c_str();
 
-    // Split the string at every x
+    // Split the string at every delim
     ptr = strtok(str, f);
     while (ptr) {
-        s += string(ptr);
+        tokens.push_back(string(ptr));
         ptr = strtok(NULL, f);
-        if (ptr)
-            s += y;
     }
 
-    return s;
+    return tokens;
 }
 
-string escape(string value)
+string replaceAll(const string &s, string x, string y)
 {
-    string s = value;
-    s = replaceAll(s, "\\", "\\\\");
-    s = replaceAll(s, "'", "\\\\\\'");
-    return s;
+    string buffer = "";
+    vector<string> tokens = split(s, x);
+
+    int count = tokens.size();
+    for (int i = 0; i < count; i++) {
+        buffer += string(tokens[i]);
+        if (i < count - 1)
+            buffer += y;
+    }
+
+    return buffer;
+}
+
+string escape(const string &s)
+{
+    string _s = replaceAll(s, "\\", "\\\\");
+    return replaceAll(_s, "'", "\\'");
+}
+
+const string WHITESPACE = " \n\r\t\f\v";
+
+string ltrim(const string &s)
+{
+    size_t start = s.find_first_not_of(WHITESPACE);
+    return (start == string::npos) ? "" : s.substr(start);
+}
+ 
+string rtrim(const string &s)
+{
+    size_t end = s.find_last_not_of(WHITESPACE);
+    return (end == string::npos) ? "" : s.substr(0, end + 1);
+}
+ 
+string trim(const string &s) {
+    return rtrim(ltrim(s));
 }
 
 string dirname(string path)

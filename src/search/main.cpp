@@ -36,7 +36,7 @@ void performSearch(Display* display, string keyword)
         remove(db_path.c_str());
 
     if (!db::create(db_path, db_name)) {
-        std::cerr << "Could't create database" << std::endl;
+        std::cerr << "Couldn't create database" << std::endl;
         return;
     }
 
@@ -45,6 +45,8 @@ void performSearch(Display* display, string keyword)
     // Open the database file
     if (!db::open(&db, db_path))
         return;
+
+    keyword = trim(keyword);
 
     if (keyword.length() == 0) {
         db::insertRom(db, db_name, {
@@ -56,7 +58,6 @@ void performSearch(Display* display, string keyword)
     }
 
     vector<ConfigEmu> configs = getEmulatorConfigs();
-    vector<RomEntry> all_results;
     int total = 0;
 
     int current_emu = 0;
@@ -107,13 +108,24 @@ void performSearch(Display* display, string keyword)
                 .ppath = label
             };
             db::insertRom(db, db_name, _entry);
-            all_results.push_back(_entry);
         }
 
         flipText(display, "Searching... " + std::to_string(current_emu) + "/" + std::to_string(total_emu));
     }
 
     flipText(display, "Compiling results...");
+
+    string all_label = "All consoles (" + std::to_string(total) + ")";
+
+    db::insertRom(db, db_name, {
+        .disp = all_label,
+        .path = "",
+        .imgpath = "",
+        .type = 1
+    });
+
+    // Copy all rows of type=0 and change ppath -> all_label
+    db::duplicateResults(db, db_name, all_label);
 
     db::insertRom(db, db_name, {
         .disp = "Clear search",
@@ -126,18 +138,6 @@ void performSearch(Display* display, string keyword)
         .path = "search",
         .imgpath = db_dir + "/../res/icon_search_field.png"
     });
-
-    string all_label = "All results (" + std::to_string(total) + ")";
-    db::insertRom(db, db_name, {
-        .disp = all_label,
-        .path = "",
-        .imgpath = "",
-        .type = 1
-    });
-
-    for (auto &entry : all_results) {
-        db::insertRom(db, db_name, entry.changePpath(all_label));
-    }
 
     sqlite3_close(db);
 }
