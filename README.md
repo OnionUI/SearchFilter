@@ -4,8 +4,6 @@ This app adds *Search* to the *Consoles* section of OnionOS and a *Filter* app u
 
 ## Search
 
-<img title="Consoles section" src="screenshots/1.png?raw=true" width="150px"> <img title="Initial screen" src="screenshots/2.png?raw=true" width="150px"> <img title="Tools" src="screenshots/3.png?raw=true" width="150px"> <img title="Enter search term" src="screenshots/4.png?raw=true" width="150px"> <img title="Results" src="screenshots/5.png?raw=true" width="150px"> <img title="Edit or clear search" src="screenshots/6.png?raw=true" width="150px">
-
 - Go to the *Consoles* section and choose *Search*.
 - Press <kbd>A</kbd> again to enter a search term.
 - Choose OK or press <kbd>START</kbd> to initiate the search.
@@ -42,3 +40,7 @@ Copy the contents of the [SearchFilter-v??.zip](https://github.com/Aemiii91/miyo
 ### Updating
 
 When updating, it is best to delete the contents of the `App/SearchFilter` directory on your SD card.
+
+## Screenshots
+
+<img title="Consoles section" src="screenshots/1.png?raw=true" width="49%"> <img title="Initial screen" src="screenshots/2.png?raw=true" width="49%"> <img title="Tools" src="screenshots/3.png?raw=true" width="49%"> <img title="Enter search term" src="screenshots/4.png?raw=true" width="49%"> <img title="Results" src="screenshots/5.png?raw=true" width="49%"> <img title="Edit or clear search" src="screenshots/6.png?raw=true" width="49%">
