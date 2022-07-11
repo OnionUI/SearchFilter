@@ -41,6 +41,33 @@ int exec(string command, string* stdout)
     return WEXITSTATUS(pclose(pipe));
 }
 
+string replaceAll(string value, string x, string y)
+{
+    string s = "";
+    char *ptr;
+    char* str = (char*)value.c_str();
+    const char* f = x.c_str();
+
+    // Split the string at every x
+    ptr = strtok(str, f);
+    while (ptr) {
+        s += string(ptr);
+        ptr = strtok(NULL, f);
+        if (ptr)
+            s += y;
+    }
+
+    return s;
+}
+
+string escape(string value)
+{
+    string s = value;
+    s = replaceAll(s, "\\", "\\\\");
+    s = replaceAll(s, "'", "\\\\\\'");
+    return s;
+}
+
 string dirname(string path)
 {
     int pos = path.find_last_of("/");

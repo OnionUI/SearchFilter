@@ -48,7 +48,7 @@ void performSearch(Display* display, string keyword)
 
     if (keyword.length() == 0) {
         db::insertRom(db, db_name, {
-            .disp = "[Enter search term...]",
+            .disp = "Enter search term...",
             .path = "search",
             .imgpath = db_dir + "/../res/icon_search_field.png"
         });
@@ -65,7 +65,7 @@ void performSearch(Display* display, string keyword)
     for (auto &config : configs) {
         current_emu++;
         string rom_path = fullpath(config.path, config.rompath);
-        string launch_cmd = "'" + fullpath(config.path) + "/" + config.launch + "'";
+        string launch_cmd = fullpath(config.path) + "/" + config.launch;
         string name = basename(rom_path);
         string cache_path = rom_path + "/" + CACHE_NAME(name);
 
@@ -99,7 +99,7 @@ void performSearch(Display* display, string keyword)
         });
 
         for (auto &entry : result) {
-            string path = launch_cmd + " '" + entry.path + "'";
+            string path = launch_cmd + ":" + entry.path;
             RomEntry _entry = {
                 .disp = entry.disp,
                 .path = path,
@@ -113,16 +113,16 @@ void performSearch(Display* display, string keyword)
         flipText(display, "Searching... " + std::to_string(current_emu) + "/" + std::to_string(total_emu));
     }
 
-    flipText(display, "Searching... " + std::to_string(total_emu) + "/" + std::to_string(total_emu));
+    flipText(display, "Compiling results...");
 
     db::insertRom(db, db_name, {
-        .disp = "[Clear search]",
+        .disp = "Clear search",
         .path = "clear",
         .imgpath = db_dir + "/../res/icon_clear_search.png"
     });
 
     db::insertRom(db, db_name, {
-        .disp = "[Search: '" + keyword + "']",
+        .disp = "Search: " + keyword,
         .path = "search",
         .imgpath = db_dir + "/../res/icon_search_field.png"
     });
@@ -156,7 +156,7 @@ int main(int argc, char** argv)
     if (argc >= 2 && std::string(argv[1]) == "clear")
         keyword = "";
     else
-        ec = kbinput(display, "Enter search term:", keyword, &keyword);
+        ec = kbinput(display, "Enter search term", keyword, &keyword);
 
     if (ec == 0) {
         if (keyword.length() > 0) {
