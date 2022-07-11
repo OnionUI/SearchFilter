@@ -139,7 +139,6 @@ void addFavoritesTools(void)
 {
     vector<FavoriteEntry> favorites = loadFavorites();
     string contents = "";
-    string launch_path = fullpath(".") + "/launch.sh";
 
     addShourtcut(&favorites, "~Fix boxart", "boxart");
     addShourtcut(&favorites, "~Sort alphabetically", "favsort");
