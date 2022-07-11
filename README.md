@@ -1,16 +1,10 @@
-# <img src="skeleton/App/SearchFilter/res/icon_search.png?raw=true" width="24"> Search & Filter for OnionOS
+# <img src="skeleton/App/SearchFilter/res/icon_search.png?raw=true" width="24"> Search / <img src="skeleton/App/SearchFilter/res/icon_filter.png?raw=true" width="24"> Filter for OnionOS
 
 This app adds *Search* to the *Consoles* section of OnionOS and a *Filter* app under *Apps*.
 
-<img src="screenshots/1.png?raw=true" width="160px"><br>Consoles section | <img src="screenshots/2.png?raw=true" width="160px"><br>New search | <img src="screenshots/3.png?raw=true" width="160px"><br>Enter search term | <img src="screenshots/4.png?raw=true" width="160px"><br>Results by console | <img src="screenshots/5.png?raw=true" width="160px"><br>Edit or clear search
-:-:|:-:|:-:|:-:|:-:
+## Search
 
-## Installation
-Copy the contents of the [zip file](https://github.com/Aemiii91/miyoomini-SearchFilter/releases) to the root of your SD card.
-
-## Usage
-
-### Search
+<img alt="Consoles section" src="screenshots/1.png?raw=true" width="150px"> <img alt="New search" src="screenshots/2.png?raw=true" width="150px"> <img alt="Enter search term" src="screenshots/3.png?raw=true" width="150px"> <img alt="Results" src="screenshots/4.png?raw=true" width="150px"> <img alt="Edit or clear search" src="screenshots/5.png?raw=true" width="150px">
 
 - Go to the *Consoles* section and choose *Search*.
 - Press <kbd>A</kbd> again to enter a search term.
@@ -21,10 +15,14 @@ Copy the contents of the [zip file](https://github.com/Aemiii91/miyoomini-Search
 
 **Note:** When the roms are refreshed, the console lists will no longer be cached, and will not be included in the search. To include them, just visit the given console list and it will be scanned and cached.
 
-### Filter
+## Filter
 
-- Open "Filter" app and apply a filter keyword.
-- The app applies the filter and tells you how much was found.
+Applying a filter will hide all games in each console list that don't match the selected keywords.
+
+- Open the *Filter* app and apply a filter keyword.
+- The app applies the filter and tells you how many games was found for each console.
 - Exit the app, and browse your ROM lists to see the filtered results.
 - To restore the ROM lists, open the app and clear the filter by pressing X.
 
+## Installation
+Copy the contents of the [zip file](https://github.com/Aemiii91/miyoomini-SearchFilter/releases) to the root of your SD card.
