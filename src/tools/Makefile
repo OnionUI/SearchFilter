@@ -1,7 +1,7 @@
 .PHONY: build
 .PHONY: clean
 
-TARGET=search
+TARGET=tools
 	
 ###########################################################
 

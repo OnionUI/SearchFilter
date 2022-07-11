@@ -21,6 +21,8 @@
 #define CENTER_H 2
 #define CENTER_V 3
 
+#define SCREEN_CENTER {320, 240}
+
 struct Rect
 {
     int x = 0;
@@ -134,6 +136,7 @@ public:
     Rect centerText(std::string value, Rect* dstrect, TTF_Font* font = NULL, SDL_Color* color = NULL);
     Rect centerText(std::string value, Rect dstrect, TTF_Font* font = NULL, SDL_Color* color = NULL);
     Rect centerText(std::string value, Rect dstrect, TTF_Font* font, SDL_Color color);
+    void flipText(std::string value);
     int textWidth(std::string value, TTF_Font* font = NULL);
     int textHeight(std::string value, TTF_Font* font = NULL);
     void clear(void);
@@ -263,6 +266,13 @@ Rect Display::text(std::string value, Rect dstrect, TTF_Font* font, SDL_Color co
 Rect Display::centerText(std::string value, Rect* dstrect, TTF_Font* font, SDL_Color* color) { return text(value, dstrect, font, color, CENTER_BOTH); }
 Rect Display::centerText(std::string value, Rect dstrect, TTF_Font* font, SDL_Color* color) { return text(value, &dstrect, font, color, CENTER_BOTH); }
 Rect Display::centerText(std::string value, Rect dstrect, TTF_Font* font, SDL_Color color) { return text(value, &dstrect, font, &color, CENTER_BOTH); }
+
+void Display::flipText(string value)
+{
+    clear();
+    centerText(value, SCREEN_CENTER, fonts.display);
+    flip();
+}
 
 int Display::textWidth(std::string value, TTF_Font* font)
 {

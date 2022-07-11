@@ -3,6 +3,7 @@
 
 #include <string>
 using std::string;
+using std::to_string;
 
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
@@ -232,7 +233,7 @@ void Keyboard::drawKey(char c, int selected, Rect keyrect)
     case CHAR_SHIFT:
         if (current_layer == 2)
             break;
-        drawIcon(res[RES_KEY_SHIFT "_" + std::to_string(shift_mode)], "SHFT", &keyrect);
+        drawIcon(res[RES_KEY_SHIFT "_" + to_string(shift_mode)], "SHFT", &keyrect);
         drawHotkey(res[RES_SMALL_L2], &keyrect);
         break;
     case CHAR_SPECIAL:

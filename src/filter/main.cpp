@@ -10,6 +10,7 @@
 #include <map>
 #include <vector>
 using std::string;
+using std::to_string;
 using std::map;
 using std::vector;
 
@@ -17,7 +18,7 @@ using std::vector;
 #include "../common/resource.hpp"
 #include "../common/legend.hpp"
 #include "../common/keymap.hpp"
-#include "../common/sysutils.hpp"
+#include "../common/utils.hpp"
 #include "../common/db_cache.hpp"
 #include "../kbinput/keyboard.hpp"
 
@@ -36,9 +37,7 @@ map<string, int> prompt_keyword(Display* display, string* keyword, bool* quit)
         length = keyword->length();
 
         if (length > 0) {
-            display->clear();
-            display->centerText("Please wait...", {320, 240});
-            display->flip();
+            display->flipText("Please wait...");
             counts = db::filterAll(temp_keyword);
             putFile(ACTIVE_KEYWORD, temp_keyword);
         }
@@ -135,7 +134,7 @@ int main(int argc, char *argv[])
                 stringstream ss;
 
                 auto addItem = [display, &lines, &ss](string name, int count) {
-                    string curr = count == -1 ? name + "*" : name + ": " + std::to_string(count);
+                    string curr = count == -1 ? name + "*" : name + ": " + to_string(count);
 
                     if (display->textWidth(ss.str() + curr) > 600) {
                         lines.push_back(ss.str());

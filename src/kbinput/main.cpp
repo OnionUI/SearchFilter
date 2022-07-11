@@ -6,6 +6,8 @@
 #include <string>
 #include <cstring>
 
+using std::string;
+
 #include "SDL/SDL.h"
 
 #include "../common/display.hpp"
@@ -13,13 +15,13 @@
 
 int main(int argc, char** argv)
 {
-    if (argc >= 2 && std::string(argv[1]) == "--version") {
+    if (argc >= 2 && string(argv[1]) == "--version") {
         std::cout << VERSION;
         exit(0);
     }
 
-    std::string initial_value = "";
-    std::string title = "";
+    string initial_value = "";
+    string title = "";
 
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
@@ -27,9 +29,9 @@ int main(int argc, char** argv)
             exit(0);
         }
         else if (strcmp(argv[i], "-i") == 0)
-            initial_value = (std::string)(argv[++i]);
+            initial_value = (string)(argv[++i]);
         else if (strcmp(argv[i], "-t") == 0)
-            title = (std::string)(argv[++i]);
+            title = (string)(argv[++i]);
         else {
             std::cerr << "Unrecognized argument: " << argv[i] << std::endl;
             exit(0);

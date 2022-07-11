@@ -6,10 +6,12 @@
 #include <iostream>
 #include <string>
 #include <vector>
+
 using std::string;
 using std::vector;
+using std::ifstream;
 
-#include "sysutils.hpp"
+#include "utils.hpp"
 
 #define IGNORED_EMU "SEARCH"
 #define EMU_PATH "/mnt/SDCARD/Emu"
@@ -34,8 +36,8 @@ ConfigEmu readEmuConfig(string config_path)
 {
     ConfigEmu config;
     Json::Value root;
-    std::ifstream ifs;
-
+    
+    ifstream ifs;
     ifs.open(config_path);
 
     Json::CharReaderBuilder builder;
@@ -44,16 +46,18 @@ ConfigEmu readEmuConfig(string config_path)
     config.path = dirname(config_path);
 
     if (!parseFromStream(builder, ifs, &root, &errs)) {
-        std::cout << errs << std::endl;
+        std::cerr << errs << std::endl;
         return config;
     }
 
-    auto addString = [&config, root](string key, string* dst) {
+    ifs.close();
+
+    auto addString = [root](string key, string* dst) {
         if (root.isMember(key))
             *dst = root[key].asString();
     };
 
-    auto addInt = [&config, root](string key, int* dst) {
+    auto addInt = [root](string key, int* dst) {
         if (root.isMember(key))
             *dst = root[key].asInt();
     };

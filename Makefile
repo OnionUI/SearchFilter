@@ -1,12 +1,13 @@
 .PHONY: all
 .PHONY: clean
 
-TARGET=filter_roms
-VERSION=1.0.1
-RELEASE_NAME=SearchFilter-$(VERSION)
-BUILD_DIR := $(shell pwd -P)/build/App/SearchFilter
+TARGET=SearchFilter
+VERSION=1.0.2
 	
 ###########################################################
+
+RELEASE_NAME=$(TARGET)-$(VERSION)
+BUILD_DIR := $(shell pwd -P)/build/App/$(TARGET)
 
 ifneq (,$(UNION_PLATFORM))
 PLATFORM=$(UNION_PLATFORM)
@@ -30,6 +31,7 @@ main:
 	cp -R ./skeleton/. ./build
 	cd ./src/filter && BUILD_DIR=$(BUILD_DIR) VERSION=$(VERSION) make
 	cd ./src/search && BUILD_DIR=$(BUILD_DIR) VERSION=$(VERSION) make
+	cd ./src/tools && BUILD_DIR=$(BUILD_DIR) VERSION=$(VERSION) make
 	# cd ./src/kbinput && BUILD_DIR=$(BUILD_DIR) VERSION=$(VERSION) make
 
 zip:
@@ -38,4 +40,4 @@ zip:
 
 clean:
 	rm -rf ./build
-	rm -rf ./release
+	rm -f ./release/$(RELEASE_NAME).zip

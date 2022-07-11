@@ -1,9 +1,10 @@
-#if !defined(SYSUTILS_HPP__)
-#define SYSUTILS_HPP__
+#if !defined(UTILS_HPP__)
+#define UTILS_HPP__
 
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstring>
 #include <vector>
 #include <map>
 #include <functional>
@@ -58,6 +59,18 @@ vector<string> split(const string &s, string delim)
     }
 
     return tokens;
+}
+
+string join(const vector<string> &ss, string delim = "")
+{
+    string s = "";
+    bool first = true;
+    for (auto &str : ss) {
+        if (first) first = false;
+        else s += delim;
+        s += str;
+    }
+    return s;
 }
 
 string replaceAll(const string &s, string x, string y)
@@ -220,4 +233,4 @@ void subdirForEach(string path, function<void(string)> callback) {
     closedir(dirFile);
 }
 
-#endif // SYSUTILS_HPP__
+#endif // UTILS_HPP__
