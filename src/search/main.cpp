@@ -85,7 +85,7 @@ void performSearch(Display* display, string keyword)
 
         vector<RomEntry> result = db::searchEntries(name, keyword);
         int subtotal = result.size();
-        string label = config.label + " (" + std::to_string(subtotal) + ")";
+        string label = trim(config.label) + " (" + std::to_string(subtotal) + ")";
 
         if (subtotal <= 0)
             continue;
@@ -113,7 +113,7 @@ void performSearch(Display* display, string keyword)
         flipText(display, "Searching... " + std::to_string(current_emu) + "/" + std::to_string(total_emu));
     }
 
-    flipText(display, "Compiling results...");
+    flipText(display, "Done");
 
     string all_label = "All consoles (" + std::to_string(total) + ")";
 
