@@ -29,14 +29,19 @@ int main(int argc, char** argv)
     else ec = kbinput(display, "Enter search term", keyword, &keyword);
 
     if (ec == 0) {
+        search_icon = IMG_Load("res/icon_search.png");
+
         if (keyword.length() > 0) {
             putFile(ACTIVE_SEARCH, keyword);
-            display->flipText("Searching...");
+            updateDisplay(display, "Searching...");
         }
         else {
             remove(ACTIVE_SEARCH);
         }
         performSearch(display, keyword);
+
+        SDL_FreeSurface(search_icon);
+        search_icon = NULL;
     }
 
     delete display;

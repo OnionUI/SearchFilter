@@ -5,7 +5,7 @@ This app adds *Search* to the *Consoles* section of OnionOS and a *Filter* app u
 ## Search
 
 - Go to the *Consoles* section and choose *Search*.
-- Press <kbd>A</kbd> again to enter a search term.
+- Select `Enter search term...`.
 - Choose OK or press <kbd>START</kbd> to initiate the search.
 - The results can be viewed in a single list with all results or several lists grouped by console.
 - Press <kbd>▲</kbd> (when on the first entry) to go to the search actions.
@@ -24,6 +24,7 @@ When the roms are refreshed, the console lists will no longer be cached, and wil
 - **Fix favorites boxart** - Fixes the boxart of favorites added from search.
 - **Sort favorites** - Quick access to sorting the favorites list alphabetically.
 - **Add tools to favorites** - will add shortcuts to the two favorites tools to the favorites list.
+- **Clean recent list** - Removes apps from recent list (bonus tool used internally to remove search related entries from the list).
 
 ## Filter
 

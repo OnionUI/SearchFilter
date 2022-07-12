@@ -18,21 +18,24 @@ using std::vector;
 
 #include "../common/utils.hpp"
 
+#define RECENTLIST_PATH "/mnt/SDCARD/Roms/recentlist.json"
 #define FAVORITES_PATH "/mnt/SDCARD/Roms/favourite.json"
-#define FAV_TOOL_LAUNCH "/mnt/SDCARD/Emu/SEARCH/../../App/SearchFilter/launch.sh"
+#define APP_ROOT "/mnt/SDCARD/Emu/SEARCH/../../App/SearchFilter"
+#define LAUNCH_PATH APP_ROOT "/launch.sh"
 
 namespace tools {
 
-struct FavoriteEntry
+struct GameEntry
 {
     string label = "";
     string launch = "";
     int type = 5;
     string rompath = "";
+    string imgpath = "";
 
-    static FavoriteEntry fromJson(string json_str)
+    static GameEntry fromJson(string json_str)
     {
-        FavoriteEntry entry;
+        GameEntry entry;
         Json::Value root;
         Json::Reader reader;
 
@@ -55,6 +58,7 @@ struct FavoriteEntry
         addString("launch", &entry.launch);
         addInt("type", &entry.type);
         addString("rompath", &entry.rompath);
+        addString("imgpath", &entry.imgpath);
 
         return entry;
     }
@@ -65,36 +69,38 @@ struct FavoriteEntry
         json_str += "\"label\":\"" + label + "\",";
         json_str += "\"launch\":\"" + launch + "\",";
         json_str += "\"type\":" + to_string(type) + ",";
+        if (imgpath.length() > 0)
+            json_str += "\"imgpath\":\"" + imgpath + "\",";
         json_str += "\"rompath\":\"" + rompath + "\"";
         json_str += "}";
         return json_str;
     }
 };
 
-vector<FavoriteEntry> loadFavorites(void) {
-    vector<FavoriteEntry> favorites;
+vector<GameEntry> loadGameEntries(string json_path) {
+    vector<GameEntry> entries;
     
-    if (!exists(FAVORITES_PATH))
-        return favorites;
+    if (!exists(json_path))
+        return entries;
 
-    ifstream infile(FAVORITES_PATH);
+    ifstream infile(json_path);
 
     string line;
     while (getline(infile, line)) {
-        FavoriteEntry entry = FavoriteEntry::fromJson(line);
+        GameEntry entry = GameEntry::fromJson(line);
         if (entry.label.length() == 0)
             continue;
-        favorites.push_back(entry);
+        entries.push_back(entry);
     }
 
     infile.close();
 
-    return favorites;
+    return entries;
 }
 
 void fixFavoritesBoxart(void)
 {
-    vector<FavoriteEntry> favorites = loadFavorites();
+    vector<GameEntry> favorites = loadGameEntries(FAVORITES_PATH);
     string contents = "";
 
     for (auto &entry : favorites) {
@@ -112,10 +118,10 @@ void fixFavoritesBoxart(void)
 
 void sortFavorites(void)
 {
-    vector<FavoriteEntry> favorites = loadFavorites();
+    vector<GameEntry> favorites = loadGameEntries(FAVORITES_PATH);
     string contents = "";
 
-    sort(favorites.begin(), favorites.end(), [](FavoriteEntry a, FavoriteEntry b) {
+    sort(favorites.begin(), favorites.end(), [](GameEntry a, GameEntry b) {
         return a.label < b.label;
     });
 
@@ -125,28 +131,48 @@ void sortFavorites(void)
     putFile(FAVORITES_PATH, contents);
 }
 
-void addShourtcut(vector<FavoriteEntry>* favorites, string label, string cmd)
+void addShourtcut(vector<GameEntry>* favorites, string label, string cmd)
 {
-    auto hasShortcut = [cmd](FavoriteEntry entry){
+    auto hasShortcut = [cmd](GameEntry entry){
         return entry.rompath == cmd;
     };
     if (any_of(favorites->begin(), favorites->end(), hasShortcut))
         return;
-    favorites->push_back({label, FAV_TOOL_LAUNCH, 5, cmd});
+    favorites->push_back({label, LAUNCH_PATH, 5, APP_ROOT "/data/~Tools/" + cmd + ".txt"});
 }
 
 void addFavoritesTools(void)
 {
-    vector<FavoriteEntry> favorites = loadFavorites();
+    vector<GameEntry> favorites = loadGameEntries(FAVORITES_PATH);
     string contents = "";
 
-    addShourtcut(&favorites, "~Fix boxart", "boxart");
-    addShourtcut(&favorites, "~Sort alphabetically", "favsort");
+    addShourtcut(&favorites, "~Fix boxart", "Fix favorites boxart");
+    addShourtcut(&favorites, "~Sort alphabetically", "Sort favorites");
 
     for (auto &entry : favorites)
         contents += entry.toJson() + "\n";
 
     putFile(FAVORITES_PATH, contents);
+}
+
+void cleanRecentList(bool only_garbage)
+{
+    vector<GameEntry> recents = loadGameEntries(RECENTLIST_PATH);
+    string contents = "";
+
+    for (auto &entry : recents) {
+        if (entry.rompath.find(":") != string::npos) {
+            vector<string> tokens = split(entry.rompath, ":");
+            entry.launch = tokens[0];
+            entry.rompath = tokens[1];
+        }
+        else if (entry.launch == LAUNCH_PATH || (!only_garbage && entry.type == 3)) {
+            continue;
+        }
+        contents += entry.toJson() + "\n";
+    }
+
+    putFile(RECENTLIST_PATH, contents);
 }
 
 } // namespace tools

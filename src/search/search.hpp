@@ -20,6 +20,24 @@ const string DB_NAME = "data";
 const string DB_DIR = fullpath(DB_NAME);
 const string DB_PATH = DB_NAME + "/" + CACHE_NAME(DB_NAME);
 
+static SDL_Surface* search_icon = NULL;
+
+void updateDisplay(Display *display, string message)
+{
+    display->clear();
+
+    if (search_icon)
+        display->blit(search_icon, {
+            320 - search_icon->w / 2,
+            180 - search_icon->h / 2,
+            search_icon->w,
+            search_icon->h
+        });
+
+    display->centerText(message, {320, 300}, display->fonts.display);
+    display->flip();
+}
+
 void addTools(sqlite3* db)
 {
     db::insertRom(db, DB_NAME, {
@@ -33,7 +51,7 @@ void addTools(sqlite3* db)
         db::insertRom(db, DB_NAME, {
             .disp = disp,
             .path = cmd,
-            .imgpath = DB_DIR + "/../res/icon_tools.png",
+            .imgpath = DB_DIR + "/" + disp + ".png",
             .type = 0,
             .ppath = "~Tools"
         });
@@ -42,6 +60,15 @@ void addTools(sqlite3* db)
     addTool("Add tools to favorites", "favtools");
     addTool("Fix favorites boxart", "boxart");
     addTool("Sort favorites", "favsort");
+}
+
+void addEmptyLines(sqlite3* db, int &total_lines)
+{
+    for (; total_lines < 6; total_lines++)
+        db::insertRom(db, DB_NAME, {
+            .disp = "~",
+            .path = "noop"
+        });
 }
 
 void performSearch(Display* display, string keyword)
@@ -55,6 +82,7 @@ void performSearch(Display* display, string keyword)
     }
 
     sqlite3* db;
+    int total_lines = 0;
 
     // Open the database file
     if (!db::open(&db, DB_PATH))
@@ -66,9 +94,11 @@ void performSearch(Display* display, string keyword)
         db::insertRom(db, DB_NAME, {
             .disp = "Enter search term...",
             .path = "search",
-            .imgpath = DB_DIR + "/../res/icon_search_field.png"
+            .imgpath = DB_DIR + "/Imgs/Enter search term....png"
         });
         addTools(db);
+        total_lines += 2;
+        addEmptyLines(db, total_lines);
         sqlite3_close(db);
         return;
     }
@@ -83,7 +113,7 @@ void performSearch(Display* display, string keyword)
 
     for (auto &config : configs) {
         current_emu++;
-        display->flipText("Searching: " + to_string(current_emu) + "/" + to_string(total_emu));
+        updateDisplay(display, "Searching: " + to_string(current_emu) + "/" + to_string(total_emu));
 
         string rom_path = fullpath(config.path, config.rompath);
         string launch_cmd = fullpath(config.path) + "/" + config.launch;
@@ -113,6 +143,7 @@ void performSearch(Display* display, string keyword)
             .imgpath = rom_path,
             .type = 1
         });
+        total_lines++;
 
         for (auto &entry : result) {
             string path = launch_cmd + ":" + entry.path;
@@ -126,7 +157,7 @@ void performSearch(Display* display, string keyword)
         }
     }
 
-    display->flipText("Done");
+    updateDisplay(display, "Done");
 
     string all_label = "All consoles (" + to_string(total) + ")";
 
@@ -136,6 +167,7 @@ void performSearch(Display* display, string keyword)
         .imgpath = "",
         .type = 1
     });
+    total_lines++;
 
     if (total == 0) {
         db::insertRom(db, DB_NAME, {
@@ -160,12 +192,13 @@ void performSearch(Display* display, string keyword)
             .imgpath = "",
             .type = 1
         });
+        total_lines++;
 
         for (auto &label : missing_caches) {
             db::insertRom(db, DB_NAME, {
                 .disp = label,
-                .path = "nocache",
-                .imgpath = DB_DIR + "/../res/icon_unavailable.png",
+                .path = "noop",
+                .imgpath = DB_DIR + "/../res/help_unavailable.png",
                 .type = 0,
                 .ppath = cache_missing_label
             });
@@ -173,18 +206,23 @@ void performSearch(Display* display, string keyword)
     }
 
     addTools(db);
+    total_lines++;
 
     db::insertRom(db, DB_NAME, {
         .disp = "Clear search",
         .path = "clear",
-        .imgpath = DB_DIR + "/../res/icon_clear_search.png"
+        .imgpath = DB_DIR + "/../res/help_clear_search.png"
     });
+    total_lines++;
 
     db::insertRom(db, DB_NAME, {
         .disp = "Search: " + keyword,
         .path = "search",
-        .imgpath = DB_DIR + "/../res/icon_search_field.png"
+        .imgpath = DB_DIR + "/Imgs/Enter search term....png"
     });
+    total_lines++;
+
+    addEmptyLines(db, total_lines);
 
     sqlite3_close(db);
 }

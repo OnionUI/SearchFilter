@@ -18,31 +18,34 @@ int main(int argc, char** argv)
         exit(0);
     }
 
-    Display* display = new Display();
+    bool no_display = argc >= 3 && string(argv[2]) == "--silent";
+
+    Display* display = no_display ? NULL : new Display();
+    auto flipText = [display](string text) {
+        if (display)
+            display->flipText(text);
+    };
+
     string mode = argc >= 2 ? string(argv[1]) : "";
 
-    if (mode == "nocache") {
-        display->centerText("Go to the console's game list", {320, 220}, display->fonts.display);
-        display->centerText("to cache it's games", {320, 270}, display->fonts.display);
-        display->flip();
-        sleep(2);
-    }
-    else if (mode == "boxart") {
-        display->flipText("Fixing boxart...");
+    if (mode == "boxart") {
         tools::fixFavoritesBoxart();
-        display->flipText("Boxart fixed");
+        flipText("Boxart fixed");
         sleep(1);
     }
     else if (mode == "favsort") {
-        display->flipText("Sorting favorites...");
         tools::sortFavorites();
-        display->flipText("Sorted");
+        flipText("Favorites sorted");
         sleep(1);
     }
     else if (mode == "favtools") {
-        display->flipText("Adding tools to favorites...");
         tools::addFavoritesTools();
-        display->flipText("Tools added");
+        flipText("Shortcuts added");
+        sleep(1);
+    }
+    else if (mode == "recents") {
+        tools::cleanRecentList(no_display);
+        flipText("Recent list cleaned");
         sleep(1);
     }
 
