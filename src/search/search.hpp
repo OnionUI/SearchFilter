@@ -22,19 +22,23 @@ const string DB_PATH = DB_NAME + "/" + CACHE_NAME(DB_NAME);
 
 static SDL_Surface* search_icon = NULL;
 
-void updateDisplay(Display *display, string message)
+void updateDisplay(Display *display, string msg, string submsg = "")
 {
     display->clear();
 
     if (search_icon)
         display->blit(search_icon, {
             320 - search_icon->w / 2,
-            180 - search_icon->h / 2,
+            150 - search_icon->h / 2,
             search_icon->w,
             search_icon->h
         });
 
-    display->centerText(message, {320, 300}, display->fonts.display);
+    display->centerText(msg, {320, 240}, display->fonts.display);
+
+    if (submsg.length() > 0)
+        display->centerText(submsg, {320, 310});
+
     display->flip();
 }
 
@@ -70,6 +74,11 @@ void addEmptyLines(sqlite3* db, int &total_lines)
             .disp = "~",
             .path = "noop"
         });
+}
+
+string totalTextMessage(int total)
+{
+    return total == 0 ? "No results" : to_string(total) + " result" + (total == 1 ? "" : "s");
 }
 
 void performSearch(Display* display, string keyword)
@@ -112,9 +121,13 @@ void performSearch(Display* display, string keyword)
 
     vector<string> missing_caches;
 
+    string status_main = "";
+    string status_sub = "";
+
     for (auto &config : configs) {
         current_emu++;
-        updateDisplay(display, "Searching: " + to_string(current_emu) + "/" + to_string(total_emu));
+        status_main = "Searching: " + to_string(current_emu) + "/" + to_string(total_emu);
+        updateDisplay(display, status_main, status_sub);
 
         string rom_path = fullpath(config.path, config.rompath);
         string launch_cmd = fullpath(config.path) + "/" + config.launch;
@@ -138,6 +151,9 @@ void performSearch(Display* display, string keyword)
 
         total += subtotal;
 
+        status_sub = totalTextMessage(total);
+        updateDisplay(display, status_main, status_sub);
+
         db::insertRom(db, DB_NAME, {
             .disp = label,
             .path = rom_path,
@@ -158,7 +174,7 @@ void performSearch(Display* display, string keyword)
         }
     }
 
-    updateDisplay(display, "Done");
+    updateDisplay(display, "Done", totalTextMessage(total));
 
     string all_label = "All consoles (" + to_string(total) + ")";
 
@@ -174,7 +190,7 @@ void performSearch(Display* display, string keyword)
         db::insertRom(db, DB_NAME, {
             .disp = "No results",
             .path = "clear",
-            .imgpath = DB_DIR + "/../res/icon_unavailable.png",
+            .imgpath = DB_DIR + "/../res/help_clear_search.png",
             .type = 0,
             .ppath = all_label
         });

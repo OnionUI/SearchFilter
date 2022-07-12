@@ -1,7 +1,7 @@
 {
-"label":"Filter",
-"icon":"res/icon_filter.png",
+"label":"Install Search/Filter",
+"icon":"res/icon_installer.png",
 "iconsel":"",
 "launch":"launch.sh",
-"description":"Apply filter to ROM lists"
+"description":"v{VERSION}"
 }
