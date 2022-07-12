@@ -51,13 +51,14 @@ void addTools(sqlite3* db)
         db::insertRom(db, DB_NAME, {
             .disp = disp,
             .path = cmd,
-            .imgpath = DB_DIR + "/" + disp + ".png",
+            .imgpath = DB_DIR + "/Imgs/" + disp + ".png",
             .type = 0,
             .ppath = "~Tools"
         });
     };
 
     addTool("Add tools to favorites", "favtools");
+    addTool("Clean recent list", "recents");
     addTool("Fix favorites boxart", "boxart");
     addTool("Sort favorites", "favsort");
 }
