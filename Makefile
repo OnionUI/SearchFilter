@@ -2,7 +2,7 @@
 .PHONY: clean
 
 TARGET=SearchFilter
-VERSION=1.2
+VERSION=1.2.1
 	
 ###########################################################
 

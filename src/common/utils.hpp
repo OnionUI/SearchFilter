@@ -123,6 +123,10 @@ string trim(const string &s) {
     return rtrim(ltrim(s));
 }
 
+string wrapQuotes(const string &s, const string quote_char = "\"") {
+    return quote_char + s + quote_char;
+}
+
 string dirname(string path)
 {
     int pos = path.find_last_of("/");

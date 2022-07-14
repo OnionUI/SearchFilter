@@ -81,20 +81,33 @@ struct ConfigEmu
         return config;
     }
 
-    string toJson(void)
+    string toJson(bool new_lines = true)
     {
         string json_str = "{";
-        json_str += "\"label\":\"" + label + "\",";
-        json_str += "\"icon\":\"" + icon + "\",";
-        json_str += "\"iconsel\":\"" + iconsel + "\",";
-        json_str += "\"launch\":\"" + launch + "\",";
-        json_str += "\"rompath\":\"" + rompath + "\",";
-        json_str += "\"imgpath\":\"" + imgpath + "\",";
-        json_str += "\"gamelist\":\"" + gamelist + "\",";
-        json_str += "\"useswap\":" + to_string(useswap) + ",";
-        json_str += "\"shortname\":" + to_string(shortname) + ",";
-        json_str += "\"hidebios\":" + to_string(hidebios) + ",";
-        json_str += "\"extlist\":\"" + extlist + "\"";
+
+        auto addLine = [&json_str, new_lines](string key, string value,
+                                              bool is_number = false,
+                                              bool remove_empty = false,
+                                              bool is_last = false) {
+            if (value.length() == 0 && remove_empty)
+                return;
+            json_str += wrapQuotes(key) + ":" + (is_number ? value : wrapQuotes(value));
+            if (!is_last) json_str += ",";
+            if (new_lines) json_str += "\n";
+        };
+
+        addLine("label", label);
+        addLine("icon", icon);
+        addLine("iconsel", iconsel, false, true);
+        addLine("launch", launch);
+        addLine("rompath", rompath);
+        addLine("imgpath", imgpath);
+        addLine("gamelist", gamelist, false, true);
+        addLine("useswap", to_string(useswap), true);
+        addLine("shortname", to_string(shortname), true);
+        addLine("hidebios", to_string(hidebios), true);
+        addLine("extlist", extlist, false, false, true);
+
         json_str += "}";
         return json_str;
     }
