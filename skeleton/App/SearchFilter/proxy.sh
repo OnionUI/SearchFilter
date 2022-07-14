@@ -1,6 +1,6 @@
 #!/bin/sh
 progdir=`dirname "$0"`
-emupath=`echo "$0" | awk '{split($0,a,"/../../"); print a[1]}'`
+emupath=`echo "$0" | awk '{st = index($0,"/../../"); print substr($0,0,st-1)}'`
 ext=`echo "$(basename "$1")" | awk -F. '{print tolower($NF)}'`
 
 if [ "$ext" = "miyoocmd" ]
