@@ -40,6 +40,34 @@ int remove(const string &file_path)
     return remove(file_path.c_str());
 }
 
+void patchGamelist(string path)
+{
+    vector<GameEntry> entries = loadGameEntries(path);
+    string contents = "";
+
+    for (auto &entry : entries) {
+        regex re("^(\\/mnt\\/SDCARD\\/Emu\\/[^\\/]*?\\/)(launch.sh)$");
+        entry.launch = regex_replace(entry.launch, re, "$1" PROXY_PATH);
+        contents += entry.toJson() + "\n";
+    }
+
+    putFile(path, contents);
+}
+
+void unpatchGamelist(string path)
+{
+    vector<GameEntry> entries = loadGameEntries(path);
+    string contents = "";
+
+    for (auto &entry : entries) {
+        regex re("^(\\/mnt\\/SDCARD\\/Emu\\/[^\\/]*?\\/)(" PROXY_RE ")$");
+        entry.launch = regex_replace(entry.launch, re, "$1launch.sh");
+        contents += entry.toJson() + "\n";
+    }
+
+    putFile(path, contents);
+}
+
 void installFilter(void)
 {
     vector<ConfigEmu> configs = getEmulatorConfigs();
@@ -74,17 +102,9 @@ void installFilter(void)
         sqlite3_close(db);
     }
 
-    // Fix favorites
-    vector<GameEntry> favorites = loadGameEntries(FAVORITES_PATH);
-    string contents = "";
-
-    for (auto &entry : favorites) {
-        regex re("^(\\/mnt\\/SDCARD\\/Emu\\/[^\\/]*?\\/)(launch.sh)$");
-        entry.launch = regex_replace(entry.launch, re, "$1" PROXY_PATH);
-        contents += entry.toJson() + "\n";
-    }
-
-    putFile(FAVORITES_PATH, contents);
+    // Fix paths of favorites and recentlist
+    patchGamelist(FAVORITES_PATH);
+    patchGamelist(RECENTLIST_PATH);
 }
 
 void uninstallFilter(void)
@@ -116,17 +136,9 @@ void uninstallFilter(void)
         sqlite3_close(db);
     }
 
-    // Fix favorites
-    vector<GameEntry> favorites = loadGameEntries(FAVORITES_PATH);
-    string contents = "";
-
-    for (auto &entry : favorites) {
-        regex re("^(\\/mnt\\/SDCARD\\/Emu\\/[^\\/]*?\\/)(" PROXY_RE ")$");
-        entry.launch = regex_replace(entry.launch, re, "$1launch.sh");
-        contents += entry.toJson() + "\n";
-    }
-
-    putFile(FAVORITES_PATH, contents);
+    // Fix paths of favorites and recentlist
+    unpatchGamelist(FAVORITES_PATH);
+    unpatchGamelist(RECENTLIST_PATH);    
 }
 
 void refreshRoms(string emu_path)
@@ -188,7 +200,18 @@ void applyFilter(Display* display, string emu_path)
         return;
     }
 
-    display->flipText("Applying filter...");
+    SDL_Surface* filter_icon = IMG_Load("res/icon_filter.png");
+    display->clear();
+    display->blit(filter_icon, {
+        320 - filter_icon->w / 2,
+        150 - filter_icon->h / 2,
+        filter_icon->w,
+        filter_icon->h
+    });
+    display->centerText("Applying filter...", {320, 240}, display->fonts.display);
+    display->flip();
+    SDL_FreeSurface(filter_icon);
+    filter_icon = NULL;
 
     string config_path = emu_path + "/config.json";
 

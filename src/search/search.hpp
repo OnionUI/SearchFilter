@@ -71,7 +71,7 @@ void addTools(sqlite3* db)
 
 string totalTextMessage(int total)
 {
-    return total == 0 ? "No results" : to_string(total) + " result" + (total == 1 ? "" : "s");
+    return to_string(total) + " game" + (total == 1 ? "" : "s");
 }
 
 void performSearch(Display* display, string keyword)
@@ -114,12 +114,12 @@ void performSearch(Display* display, string keyword)
 
     vector<string> missing_caches;
 
-    string status_main = "";
+    string status_main = "0 games";
     string status_sub = "";
 
     for (auto &config : configs) {
         current_emu++;
-        status_main = "Searching: " + to_string(current_emu) + "/" + to_string(total_emu);
+        status_sub = "Searching: " + to_string(current_emu) + "/" + to_string(total_emu);
         updateDisplay(display, status_main, status_sub);
 
         string emu_path = dirname(config.path);
@@ -145,7 +145,7 @@ void performSearch(Display* display, string keyword)
 
         total += subtotal;
 
-        status_sub = totalTextMessage(total);
+        status_main = totalTextMessage(total);
         updateDisplay(display, status_main, status_sub);
 
         db::insertRom(db, DB_NAME, {
@@ -168,7 +168,7 @@ void performSearch(Display* display, string keyword)
         }
     }
 
-    updateDisplay(display, "Done", totalTextMessage(total));
+    updateDisplay(display, totalTextMessage(total), "Done");
 
     string all_label = "All consoles (" + to_string(total) + ")";
 

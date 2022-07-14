@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <stdio.h>
+
 using std::string;
 
 #include "../common/display.hpp"
@@ -31,13 +32,11 @@ int main(int argc, char** argv)
     if (ec == 0) {
         search_icon = IMG_Load("res/icon_search.png");
 
-        if (keyword.length() > 0) {
+        if (keyword.length() > 0)
             putFile(ACTIVE_SEARCH, keyword);
-            updateDisplay(display, "Searching...");
-        }
-        else {
+        else
             remove(ACTIVE_SEARCH);
-        }
+
         performSearch(display, keyword);
 
         SDL_FreeSurface(search_icon);
