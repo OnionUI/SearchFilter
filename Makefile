@@ -2,7 +2,7 @@
 .PHONY: clean
 
 TARGET=SearchFilter
-VERSION=1.1
+VERSION=1.2
 	
 ###########################################################
 
@@ -21,7 +21,7 @@ endif
 
 all: setup main
 
-release: clean setup main zip
+release: clean setup main package
 
 setup:
 	mkdir -p ./build
@@ -29,16 +29,25 @@ setup:
 main:
 	@echo BUILD_DIR $(BUILD_DIR)
 	cp -R ./skeleton/. ./build
-	# sed -i "s/{VERSION}/$(VERSION)/g" $(BUILD_DIR)/config.json
+	rm -f $(BUILD_DIR)/config.json
+	rm -f $(BUILD_DIR)/install.sh
 	cd ./src/filter && BUILD_DIR=$(BUILD_DIR) VERSION=$(VERSION) make
 	cd ./src/search && BUILD_DIR=$(BUILD_DIR) VERSION=$(VERSION) make
 	cd ./src/tools && BUILD_DIR=$(BUILD_DIR) VERSION=$(VERSION) make
 	# cd ./src/kbinput && BUILD_DIR=$(BUILD_DIR) VERSION=$(VERSION) make
 
-zip:
+package:
+	rm -rf ./package
+	mkdir -p ./package/App/$(TARGET)
+	cd ./build && zip -r ../package/App/$(TARGET)/PACKAGE.zip App Emu
+	cp ./skeleton/App/$(TARGET)/install.sh ./package/App/$(TARGET)
+	cp ./skeleton/App/$(TARGET)/config.json ./package/App/$(TARGET)
+	cp ./skeleton/App/$(TARGET)/res/icon_installer.png ./package/App/$(TARGET)/icon.png
+	sed -i "s/{VERSION}/$(VERSION)/g" ./package/App/$(TARGET)/config.json
 	mkdir -p ./release
-	cd ./build && zip -r ../release/$(RELEASE_NAME).zip App Emu
+	cd ./package && zip -r ../release/$(RELEASE_NAME).zip App
 
 clean:
 	rm -rf ./build
+	rm -rf ./package
 	rm -f ./release/$(RELEASE_NAME).zip

@@ -2,6 +2,7 @@
 
 This app adds *Search* to the *Consoles* section and an optional *Filter* function for each console list.
 
+
 ## Search
 
 - Go to the *Consoles* section and choose *Search*.
@@ -15,6 +16,7 @@ This app adds *Search* to the *Consoles* section and an optional *Filter* functi
 
 > **Tip:** Instead of choosing "refresh roms" after adding a new rom, simply delete the `*_cache2.db` file inside the rom folder - now you'll only need to visit one console list! This is made even easier with the `Install filter` tool, which adds a `Refresh roms` shortcut to the bottom of each console list, which will only delete the corresponding cache.
 
+
 ### Tools
 
 *Search* now has a *Tools* section which includes:
@@ -26,18 +28,18 @@ This app adds *Search* to the *Consoles* section and an optional *Filter* functi
 - **Install filter** - Adds filter shortcuts to the bottom of each console list.
 - **Uninstall filter** - Removes the filter shortcuts from each console list.
 
+
 ### Filter
 
 To manually enable the filter option go to `Consoles > Search > Tools > Install filter`. This will add two shortcuts to the bottom of each console list: `Filter` and `Refresh roms`. Use the `Filter` option to apply a filter to the list. The `Refresh roms` shortcut is a bonus feature, which allows you to refresh a single list, instead of the built-in counterpart which forces a refresh of all lists at once.
 
 **Note:** Filters will not limit search results.
 
+
 ## Installation
-Copy the contents of the [SearchFilter-v??.zip](https://github.com/Aemiii91/miyoomini-SearchFilter/releases) file to the root of your SD card.
 
-### Updating
+Copy the contents of the [SearchFilter-v??.zip](https://github.com/Aemiii91/miyoomini-SearchFilter/releases) file to the root of your SD card. Then on your Miyoo Mini go to `Apps` and select `Install Search/Filter`, this will install or update Search/Filter.
 
-When updating, it is best to delete the contents of the `App/SearchFilter` directory on your SD card.
 
 ## Screenshots
 
