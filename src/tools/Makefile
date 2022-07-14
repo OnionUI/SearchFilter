@@ -21,7 +21,7 @@ endif
 
 CC = $(CROSS_COMPILE)g++
 CFLAGS = -I../../include -I../common -DVERSION=\"$(VERSION)\" -DPLATFORM_$(shell echo $(PLATFORM) | tr a-z A-Z)
-LDFLAGS = -s -lSDL -lSDL_image -lSDL_ttf -lrt -lz -lm -lsqlite3
+LDFLAGS = -s -lSDL -lSDL_image -lSDL_ttf -lrt -lz -lm
 OPTM=-O3
 
 build:

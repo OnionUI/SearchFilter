@@ -73,6 +73,17 @@ string join(const vector<string> &ss, string delim = "")
     return s;
 }
 
+template<typename T>
+vector<T> removeValue(const vector<T> &vec, const T &value)
+{
+    vector<T> res;
+    for (auto &item : vec) {
+        if (item != value)
+            res.push_back(item);
+    }
+    return res;
+}
+
 string replaceAll(const string &s, string x, string y)
 {
     string buffer = "";
@@ -123,6 +134,14 @@ string basename(string path)
     return path.substr(path.find_last_of("/") + 1);
 }
 
+string getExtension(string path)
+{
+    int pos = path.find_last_of(".");
+    if (pos != string::npos)
+        return path.substr(pos + 1);
+    return "";
+}
+
 string fullpath(string root, string rel = "")
 {
     string fullpath = "";
@@ -171,6 +190,7 @@ string getFile(string file_path)
 
 void putFile(string file_path, string contents)
 {
+    system(string("mkdir -p '" + dirname(file_path) + "'").c_str());
     ofstream file(file_path, ios::trunc);
     if (file.is_open()) {
         file << contents;

@@ -61,19 +61,12 @@ void addTools(sqlite3* db)
         });
     };
 
-    addTool("Add tools to favorites", "favtools");
-    addTool("Clean recent list", "recents");
-    addTool("Fix favorites boxart", "boxart");
-    addTool("Sort favorites", "favsort");
-}
-
-void addEmptyLines(sqlite3* db, int &total_lines)
-{
-    for (; total_lines < 6; total_lines++)
-        db::insertRom(db, DB_NAME, {
-            .disp = "~",
-            .path = "noop"
-        });
+    addTool("1. Fix favorites boxart", "boxart");
+    addTool("2. Sort favorites", "favsort");
+    addTool("3. Add tools to favorites", "favtools");
+    addTool("4. Clean recent list", "recents");
+    addTool("5. Install filter", "install_filter");
+    addTool("6. Uninstall filter", "uninstall_filter");
 }
 
 string totalTextMessage(int total)
@@ -108,7 +101,7 @@ void performSearch(Display* display, string keyword)
         });
         addTools(db);
         total_lines += 2;
-        addEmptyLines(db, total_lines);
+        db::addEmptyLines(db, DB_NAME, total_lines);
         sqlite3_close(db);
         return;
     }
@@ -129,8 +122,9 @@ void performSearch(Display* display, string keyword)
         status_main = "Searching: " + to_string(current_emu) + "/" + to_string(total_emu);
         updateDisplay(display, status_main, status_sub);
 
-        string rom_path = fullpath(config.path, config.rompath);
-        string launch_cmd = fullpath(config.path) + "/" + config.launch;
+        string emu_path = dirname(config.path);
+        string rom_path = fullpath(emu_path, config.rompath);
+        string launch_cmd = fullpath(emu_path) + "/" + config.launch;
         string name = basename(rom_path);
         string cache_path = rom_path + "/" + CACHE_NAME(name);
 
@@ -239,7 +233,7 @@ void performSearch(Display* display, string keyword)
     });
     total_lines++;
 
-    addEmptyLines(db, total_lines);
+    db::addEmptyLines(db, DB_NAME, total_lines);
 
     sqlite3_close(db);
 }

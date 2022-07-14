@@ -1,37 +1,51 @@
 #!/bin/sh
 echo $0 $*
 progdir=`cd -- "$(dirname "$0")" >/dev/null 2>&1; pwd -P`
-dname=`dirname "$1"`
-filename=`basename "$1"`
-datadir="/mnt/SDCARD/Emu/SEARCH/../../App/SearchFilter/data"
+ext=`echo "$(basename "$1")" | awk -F. '{print tolower($NF)}'`
 
 cd $progdir
 echo "$(date):" $0 $* >> debug.log
-echo "$filename" >> debug.log
 
-if [ "$dname" = "$datadir" ] || [ "$dname" = "$datadir/~Tools" ]
+if [ "$ext" = "miyoocmd" ]
 then
-    if [ "$filename" = "Enter search term....txt" ]
+    filename=`basename "$1" .miyoocmd`
+
+    if [ "$filename" = "Enter search term..." ]
     then
         mode="search"
-    elif [ "$filename" = "Fix favorites boxart.txt" ]
+    elif [ "$filename" = "1. Fix favorites boxart" ]
     then
         mode="boxart"
-    elif [ "$filename" = "Sort favorites.txt" ]
+    elif [ "$filename" = "2. Sort favorites" ]
     then
         mode="favsort"
-    elif [ "$filename" = "Add tools to favorites.txt" ]
+    elif [ "$filename" = "3. Add tools to favorites" ]
     then
         mode="favtools"
-    elif [ "$filename" = "Clean recent list.txt" ]
+    elif [ "$filename" = "4. Clean recent list" ]
     then
         mode="recents"
+    elif [ "$filename" = "5. Install filter" ]
+    then
+        mode="install_filter"
+    elif [ "$filename" = "6. Uninstall filter" ]
+    then
+        mode="uninstall_filter"
+    elif [ "$filename" = "~Filter" ]
+    then
+        mode="filter"
+    elif [ "$filename" = "~Clear filter" ]
+    then
+        mode="clear_filter"
+    elif [ "$filename" = "~Refresh roms" ]
+    then
+        mode="refresh"
     else
         mode="noop"
     fi
 elif [ "$1" = "" ]
 then
-    mode="filter"
+    mode="noop"
 else
     mode="$1"
 fi
@@ -40,11 +54,11 @@ echo "launch mode:" $mode
 
 if [ "$mode" = "noop" ]
 then
-    noop=1
+    echo noop >> $progdir/debug.log
 
-elif [ "$mode" = "filter" ]
+elif [ "$mode" = "filter" ] || [ "$mode" = "clear_filter" ] || [ "$mode" = "install_filter" ] || [ "$mode" = "uninstall_filter" ] || [ "$mode" = "refresh" ]
 then
-    LD_LIBRARY_PATH="$progdir/lib:$LD_LIBRARY_PATH" ./filter 2>&1 >> debug.log
+    LD_LIBRARY_PATH="$progdir/lib:$LD_LIBRARY_PATH" ./filter "$mode" "$2" 2>&1 >> debug.log
 
 elif [ "$mode" = "clear" ]
 then

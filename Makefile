@@ -2,7 +2,7 @@
 .PHONY: clean
 
 TARGET=SearchFilter
-VERSION=1.0.3
+VERSION=1.1
 	
 ###########################################################
 
@@ -29,7 +29,7 @@ setup:
 main:
 	@echo BUILD_DIR $(BUILD_DIR)
 	cp -R ./skeleton/. ./build
-	sed -i "s/{VERSION}/$(VERSION)/g" $(BUILD_DIR)/config.json
+	# sed -i "s/{VERSION}/$(VERSION)/g" $(BUILD_DIR)/config.json
 	cd ./src/filter && BUILD_DIR=$(BUILD_DIR) VERSION=$(VERSION) make
 	cd ./src/search && BUILD_DIR=$(BUILD_DIR) VERSION=$(VERSION) make
 	cd ./src/tools && BUILD_DIR=$(BUILD_DIR) VERSION=$(VERSION) make

@@ -42,7 +42,7 @@ namespace db::sql {
 
 string search(string table, const string &keyword_str)
 {
-    string sql = sqlite3_mprintf("SELECT * FROM %Q", table.c_str());
+    string sql = sqlite3_mprintf("SELECT * FROM %Q WHERE path NOT LIKE '%%.miyoocmd'", table.c_str());
     vector<string> keywords = split(keyword_str, " ");
 
     bool first = true;
@@ -52,8 +52,7 @@ string search(string table, const string &keyword_str)
         string keyword = trim(keywords[i]);
         if (keyword.length() == 0)
             continue;
-        sql += (first ? " WHERE" : " AND");
-        sql += sqlite3_mprintf(" disp LIKE '%%%q%%'", keyword.c_str());
+        sql += sqlite3_mprintf(" AND disp LIKE '%%%q%%'", keyword.c_str());
         first = false;
     }
 
@@ -72,11 +71,29 @@ string subdirs(string table, string search_query)
 string filter(string table, string search_query)
 {
     string sql =
-        "DELETE FROM %Q WHERE "
-            "type=0 AND id NOT IN (SELECT id FROM (%s)) OR "
-            "type=1 AND id NOT IN (SELECT id FROM (%s));";
+        "UPDATE %Q SET ppath = ppath || '<filtered>' WHERE "
+            "path NOT LIKE '%%.miyoocmd' AND "
+            "ppath NOT LIKE '%%<filtered>' AND "
+            "(type=0 AND id NOT IN (SELECT id FROM (%s)) OR "
+            "type=1 AND id NOT IN (SELECT id FROM (%s)));";
     string subdir_query = subdirs(table, search_query);
     return string(sqlite3_mprintf(sql.c_str(), table.c_str(), search_query.c_str(), subdir_query.c_str()));
+}
+
+string clear_filter(string name)
+{
+    string sql =
+        "UPDATE %Q SET ppath = SUBSTRING(ppath,1,length(ppath)-10) WHERE ppath LIKE '%%<filtered>';";
+    string table = TABLE_NAME(name);
+    return string(sqlite3_mprintf(sql.c_str(), table.c_str()));
+}
+
+string delete_commands(string name)
+{
+    string sql =
+        "DELETE FROM %Q WHERE path LIKE '%%.miyoocmd'";
+    string table = TABLE_NAME(name);
+    return string(sqlite3_mprintf(sql.c_str(), table.c_str()));
 }
 
 string create_roms_table(string name)
@@ -135,7 +152,6 @@ bool open(sqlite3** db, string path)
         sqlite3_close(*db);
         return false;
     }
-
     return true;
 }
 
@@ -146,7 +162,6 @@ bool open_readonly(sqlite3** db, string path)
         sqlite3_close(*db);
         return false;
     }
-
     return true;
 }
 
@@ -159,7 +174,6 @@ bool prepare(sqlite3* db, sqlite3_stmt** stmt, const char* query)
         sqlite3_close(db);
         return false;
     }
-
     return true;
 }
 bool prepare(sqlite3* db, sqlite3_stmt** stmt, string query)
@@ -172,9 +186,28 @@ bool isDone(sqlite3* db, int rc)
     if (rc != SQLITE_DONE) {
         std::cerr << "ERROR: while performing sql: " << sqlite3_errmsg(db) << std::endl;
         std::cerr << "Return code: " << to_string(rc) << std::endl;
+        sqlite3_close(db);
         return false;
     }
+    return true;
+}
 
+bool execSql(sqlite3* db, string sql)
+{
+    int rc;
+    sqlite3_stmt* stmt;
+
+    // Prepare SQL statement
+    if(!prepare(db, &stmt, sql))
+        return false;
+
+    // Execute statement
+    rc = sqlite3_step(stmt);
+    
+    if (!isDone(db, rc))
+        return false;
+
+    sqlite3_finalize(stmt);
     return true;
 }
 
@@ -182,57 +215,32 @@ bool create(string path, string name)
 {
     int rc;
     sqlite3* db;
-    sqlite3_stmt* stmt;
 
     // Open the database file
     if (!open(&db, path))
         return false;
 
-    // Create roms table
-    if(!prepare(db, &stmt, sql::create_roms_table(name)))
+    // Create roms table    
+    if(!execSql(db, sql::create_roms_table(name)))
         return false;
-    rc = sqlite3_step(stmt);
-    
-    if (!isDone(db, rc))
-        return false;
-
-    sqlite3_finalize(stmt);
+        
     sqlite3_close(db);
     return true;
 }
 
 bool insertRom(sqlite3* db, string name, RomEntry entry)
 {
-    int rc;
-    sqlite3_stmt* stmt;
-
-    // Create roms table
-    if(!prepare(db, &stmt, sql::insert(name, entry)))
-        return false;
-    rc = sqlite3_step(stmt);
-    
-    if (!isDone(db, rc))
-        return false;
-
-    sqlite3_finalize(stmt);
-    return true;
+    return execSql(db, sql::insert(name, entry));
 }
 
 bool duplicateResults(sqlite3* db, string name, string ppath)
 {
-    int rc;
-    sqlite3_stmt* stmt;
+    return execSql(db, sql::dupChangePpath(name, ppath));
+}
 
-    // Create roms table
-    if(!prepare(db, &stmt, sql::dupChangePpath(name, ppath)))
-        return false;
-    rc = sqlite3_step(stmt);
-    
-    if (!isDone(db, rc))
-        return false;
-
-    sqlite3_finalize(stmt);
-    return true;
+bool removeCommands(sqlite3* db, string name)
+{
+    return execSql(db, sql::delete_commands(name));
 }
 
 vector<RomEntry> searchEntries(string name, string keyword)
@@ -282,37 +290,26 @@ bool filterEntries(sqlite3* db, string name, string keyword)
 {
     if (keyword.length() == 0)
         return true;
-
-    int rc;
-    int count = 0;
-    sqlite3_stmt* stmt;
     string table = TABLE_NAME(name);
-
     string search_query = sql::search(table, keyword);
     string filter_query = sql::filter(table, search_query);
-
-    // Prepare filter query
-    if(!prepare(db, &stmt, filter_query))
-        return false;
-
-    // Execute query
-    rc = sqlite3_step(stmt);
-    
-    if (!isDone(db, rc))
-        return false;
-
-    sqlite3_finalize(stmt);
-    return true;
+    return execSql(db, filter_query);
 }
 
-int countEntries(sqlite3* db, string name)
+bool clearFilter(sqlite3* db, string name)
+{
+    return execSql(db, sql::clear_filter(name));
+}
+
+int countRootEntries(sqlite3* db, string name)
 {
     int rc, count;
     sqlite3_stmt* stmt;
     string table = TABLE_NAME(name);
+    string sql = "SELECT count(*) FROM %Q WHERE ppath='.';";
 
     // Prepare row count query
-    if(!prepare(db, &stmt, sqlite3_mprintf("SELECT count(*) FROM %Q WHERE type=0;", table.c_str())))
+    if(!prepare(db, &stmt, sqlite3_mprintf(sql.c_str(), table.c_str())))
         return -1;
 
     // Execute row count query
@@ -326,103 +323,14 @@ int countEntries(sqlite3* db, string name)
     sqlite3_finalize(stmt);
     return count;
 }
-int countEntries(string path, string name)
+
+void addEmptyLines(sqlite3* db, string name, int &total_lines)
 {
-    int count;
-    sqlite3* db;
-
-    // Open the database file
-    if (!open(&db, path))
-        return -1;
-
-    count = countEntries(db, name);
-
-    sqlite3_close(db);
-    return count;
-}
-
-int filterAndCount(string path, string name, string keyword)
-{
-    int count;
-    sqlite3* db;
-
-    // Open the database file
-    if (!open(&db, path))
-        return -1;
-
-    if (!filterEntries(db, name, keyword))
-        return -1;
-
-    count = countEntries(db, name);
-
-    sqlite3_close(db);
-    return count;
-}
-
-void clearAll()
-{
-    subdirForEach(ROMS_PATH, [](string name) {
-        string path = CACHE_PATH(name);
-        string backup_path = path + ".backup";
-
-        // If cache does not exist, remove backup and exit
-        if (!exists(path)) {
-            if (exists(backup_path))
-                remove(backup_path.c_str());
-            return;
-        }
-
-        // If no backup is found, do nothing
-        if (!exists(backup_path) || countEntries(backup_path, name) <= 0)
-            return;
-        
-        // Restore the cache from backup
-        remove(path.c_str());
-        rename(backup_path.c_str(), path.c_str());
-    });
-}
-
-map<string, int> filterAll(string keyword)
-{
-    clearAll();
-
-    map<string, int> results;
-
-    subdirForEach(ROMS_PATH, [keyword, &results](string name) {
-        string path = CACHE_PATH(name);
-        string backup_path = path + ".backup";
-
-        // If cache isn't found, we can't filter it
-        if (!exists(path))
-            return;
-
-        // Create backup of cache (if not empty)
-        if (!exists(backup_path) && countEntries(path, name) > 0)
-            copyFile(path, backup_path);
-
-        // Filter the cache db and return count
-        results[name] = filterAndCount(path, name, keyword);
-    });
-
-    return results;
-}
-
-map<string, vector<RomEntry>> searchAll(string keyword)
-{
-    map<string, vector<RomEntry>> results;
-
-    subdirForEach(ROMS_PATH, [keyword, &results](string name) {
-        string path = CACHE_PATH(name);
-
-        // If cache isn't found, we can't filter it
-        if (!exists(path))
-            return;
-
-        // Filter the cache db and return count
-        results[name] = searchEntries(name, keyword);
-    });
-
-    return results;
+    for (; total_lines < 6; total_lines++)
+        insertRom(db, name, {
+            .disp = "~",
+            .path = "noop.miyoocmd"
+        });
 }
 
 } // namespace db
