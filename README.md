@@ -44,3 +44,7 @@ Copy the contents of the [SearchFilter-v??.zip](https://github.com/Aemiii91/miyo
 ## Screenshots
 
 <img title="Consoles section" src="screenshots/001-v1.1.png?raw=true" width="49%"> <img title="Initial screen" src="screenshots/002-v1.1.png?raw=true" width="49%"> <img title="Tools" src="screenshots/003-v1.1.png?raw=true" width="49%"> <img title="Enter search term" src="screenshots/004-v1.1.png?raw=true" width="49%"> <img title="Results" src="screenshots/005-v1.1.png?raw=true" width="49%"> <img title="Edit or clear search" src="screenshots/006-v1.1.png?raw=true" width="49%">
+
+---
+
+Icons by [Icons8](https://icons8.com)
