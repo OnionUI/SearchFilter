@@ -1,0 +1,12 @@
+{
+"label":" Search ",
+"icon":"../../App/SearchFilter/res/icon_search_p.png",
+"iconsel":"",
+"launch":"../../App/SearchFilter/launch.sh",
+"rompath":"../../App/SearchFilter/data",
+"imgpath":"../../App/SearchFilter/data/Imgs",
+"useswap":1,
+"shortname":0,
+"hidebios":0,
+"extlist":"miyoocmd"
+}

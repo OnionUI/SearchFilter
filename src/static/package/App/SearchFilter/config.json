@@ -1,0 +1,7 @@
+{
+"label":"Install Search/Filter",
+"icon":"icon.png",
+"iconsel":"",
+"launch":"install.sh",
+"description":"v{VERSION}"
+}
