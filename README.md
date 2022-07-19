@@ -1,4 +1,4 @@
-# <img src="src/static/App/SearchFilter/res/icon_search.png?raw=true" width="24"> Search / <img src="src/static/App/SearchFilter/res/icon_filter.png?raw=true" width="24"> Filter for Onion
+# <img src="src/static/build/App/SearchFilter/res/icon_search.png?raw=true" width="24"> Search / <img src="src/static/build/App/SearchFilter/res/icon_filter.png?raw=true" width="24"> Filter for Onion
 
 This app adds *Search* to the *Consoles* section and an optional *Filter* function for each console list.
 
@@ -47,4 +47,4 @@ Copy the contents of the [SearchFilter-v??.zip](https://github.com/Aemiii91/miyo
 
 ---
 
-Icons by [Icons8](https://icons8.com)
+<p align="right"><sup>Icons by <a href="https://icons8.com">Icons8</a></sup></p>
