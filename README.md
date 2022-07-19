@@ -1,4 +1,4 @@
-# <img src="skeleton/App/SearchFilter/res/icon_search.png?raw=true" width="24"> Search / <img src="skeleton/App/SearchFilter/res/icon_filter.png?raw=true" width="24"> Filter for Onion
+# <img src="src/static/App/SearchFilter/res/icon_search.png?raw=true" width="24"> Search / <img src="src/static/App/SearchFilter/res/icon_filter.png?raw=true" width="24"> Filter for Onion
 
 This app adds *Search* to the *Consoles* section and an optional *Filter* function for each console list.
 

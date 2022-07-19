@@ -87,17 +87,17 @@ public:
             exit(1);
         }
 
-        if (!(screen = SDL_SetVideoMode(640, 480, 32, SDL_SWSURFACE))) {
-            std::cerr << "Could not set video mode: " << SDL_GetError() << std::endl;
-            SDL_Quit();
-            exit(1);
-        }
-
         // Hide the cursor
         SDL_ShowCursor(SDL_DISABLE);
 
         // Enable Unicode translation
         SDL_EnableUNICODE(1);
+
+        if (!(screen = SDL_SetVideoMode(640, 480, 32, SDL_SWSURFACE))) {
+            std::cerr << "Could not set video mode: " << SDL_GetError() << std::endl;
+            SDL_Quit();
+            exit(1);
+        }
 
         // Load font
         TTF_Init();

@@ -10,7 +10,7 @@ using std::string;
 
 #include "../common/display.hpp"
 #include "../common/utils.hpp"
-#include "../common/config.hpp"
+#include "../common/ConfigEmu.hpp"
 #include "../kbinput/keyboard.hpp"
 
 #include "search.hpp"

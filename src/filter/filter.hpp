@@ -13,9 +13,9 @@ using std::regex;
 using std::regex_replace;
 
 #include "../common/utils.hpp"
-#include "../common/config.hpp"
+#include "../common/ConfigEmu.hpp"
 #include "../common/db_cache.hpp"
-#include "../common/game_entry.hpp"
+#include "../common/GameJsonEntry.hpp"
 #include "../kbinput/keyboard.hpp"
 
 #define PROXY_PATH "../../App/SearchFilter/proxy.sh"
@@ -42,7 +42,7 @@ int remove(const string &file_path)
 
 void patchGamelist(string path)
 {
-    vector<GameEntry> entries = loadGameEntries(path);
+    vector<GameJsonEntry> entries = loadGameJsonEntries(path);
     string contents = "";
 
     for (auto &entry : entries) {
@@ -56,7 +56,7 @@ void patchGamelist(string path)
 
 void unpatchGamelist(string path)
 {
-    vector<GameEntry> entries = loadGameEntries(path);
+    vector<GameJsonEntry> entries = loadGameJsonEntries(path);
     string contents = "";
 
     for (auto &entry : entries) {

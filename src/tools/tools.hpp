@@ -12,7 +12,7 @@ using std::string;
 using std::vector;
 
 #include "../common/utils.hpp"
-#include "../common/game_entry.hpp"
+#include "../common/GameJsonEntry.hpp"
 
 #define APP_ROOT "/mnt/SDCARD/Emu/SEARCH/../../App/SearchFilter"
 #define LAUNCH_PATH APP_ROOT "/launch.sh"
@@ -21,7 +21,7 @@ namespace tools {
 
 void fixFavoritesBoxart(void)
 {
-    vector<GameEntry> favorites = loadGameEntries(FAVORITES_PATH);
+    vector<GameJsonEntry> favorites = loadGameJsonEntries(FAVORITES_PATH);
     string contents = "";
 
     for (auto &entry : favorites) {
@@ -39,10 +39,10 @@ void fixFavoritesBoxart(void)
 
 void sortFavorites(void)
 {
-    vector<GameEntry> favorites = loadGameEntries(FAVORITES_PATH);
+    vector<GameJsonEntry> favorites = loadGameJsonEntries(FAVORITES_PATH);
     string contents = "";
 
-    sort(favorites.begin(), favorites.end(), [](GameEntry a, GameEntry b) {
+    sort(favorites.begin(), favorites.end(), [](GameJsonEntry a, GameJsonEntry b) {
         return a.label < b.label;
     });
 
@@ -52,9 +52,9 @@ void sortFavorites(void)
     putFile(FAVORITES_PATH, contents);
 }
 
-void addShourtcut(vector<GameEntry>* favorites, string label, string cmd)
+void addShourtcut(vector<GameJsonEntry>* favorites, string label, string cmd)
 {
-    auto hasShortcut = [cmd](GameEntry entry){
+    auto hasShortcut = [cmd](GameJsonEntry entry){
         return entry.rompath == cmd;
     };
     if (any_of(favorites->begin(), favorites->end(), hasShortcut))
@@ -64,7 +64,7 @@ void addShourtcut(vector<GameEntry>* favorites, string label, string cmd)
 
 void addFavoritesTools(void)
 {
-    vector<GameEntry> favorites = loadGameEntries(FAVORITES_PATH);
+    vector<GameJsonEntry> favorites = loadGameJsonEntries(FAVORITES_PATH);
     string contents = "";
 
     addShourtcut(&favorites, "~Fix boxart", "Fix favorites boxart");
@@ -78,7 +78,7 @@ void addFavoritesTools(void)
 
 void cleanRecentList(bool only_garbage)
 {
-    vector<GameEntry> recents = loadGameEntries(RECENTLIST_PATH);
+    vector<GameJsonEntry> recents = loadGameJsonEntries(RECENTLIST_PATH);
     string contents = "";
 
     for (auto &entry : recents) {

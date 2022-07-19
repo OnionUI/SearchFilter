@@ -12,7 +12,7 @@ using std::vector;
 #include "../common/display.hpp"
 #include "../common/utils.hpp"
 #include "../common/db_cache.hpp"
-#include "../common/config.hpp"
+#include "../common/ConfigEmu.hpp"
 
 #define ACTIVE_SEARCH "active_search"
 
