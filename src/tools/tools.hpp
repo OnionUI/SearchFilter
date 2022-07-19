@@ -43,7 +43,7 @@ void sortFavorites(void)
     string contents = "";
 
     sort(favorites.begin(), favorites.end(), [](GameJsonEntry a, GameJsonEntry b) {
-        return a.label < b.label;
+        return tolower(a.label) < tolower(b.label);
     });
 
     for (auto &entry : favorites)

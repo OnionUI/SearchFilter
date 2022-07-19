@@ -1,7 +1,7 @@
 .PHONY: all setup build package release clean
 
 TARGET=SearchFilter
-VERSION=1.3
+VERSION=1.2.2
 	
 ###########################################################
 

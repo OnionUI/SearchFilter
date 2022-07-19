@@ -8,6 +8,8 @@
 #include <vector>
 #include <map>
 #include <functional>
+#include <algorithm>
+#include <cctype>
 #include <unistd.h>
 #include <dirent.h>
 
@@ -125,6 +127,14 @@ string trim(const string &s) {
 
 string wrapQuotes(const string &s, const string quote_char = "\"") {
     return quote_char + s + quote_char;
+}
+
+string tolower(const string &s)
+{
+    string result = s;
+    std::transform(result.begin(), result.end(), result.begin(),
+        [](unsigned char c){ return std::tolower(c); });
+    return result;
 }
 
 string dirname(string path)
