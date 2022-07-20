@@ -31,7 +31,7 @@ This app adds *Search* to the *Consoles* section and an optional *Filter* functi
 
 ### Filter
 
-To manually enable the filter option go to `Consoles > Search > Tools > Install filter`. This will add two shortcuts to the bottom of each console list: `Filter` and `Refresh roms`. Use the `Filter` option to apply a filter to the list. The `Refresh roms` shortcut is a bonus feature, which allows you to refresh a single list, instead of the built-in counterpart which forces a refresh of all lists at once.
+To manually enable the filter option go to `Consoles` ➜ `Search` ➜ `Tools` ➜ `Install filter`. This will add two shortcuts to the bottom of each console list: `Filter` and `Refresh roms`. Use the `Filter` option to apply a filter to the list. The `Refresh roms` shortcut is a bonus feature, which allows you to refresh a single list, instead of the built-in counterpart which forces a refresh of all lists at once.
 
 **Note:** Filters will not limit search results.
 
