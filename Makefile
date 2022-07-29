@@ -15,6 +15,7 @@ all: clean setup build package
 setup:
 	@mkdir -p $(BUILD_DIR)
 	@cp -R ./src/static/build/. ./build
+	@cp -R ./lib/. $(BUILD_DIR)/lib
 
 build:
 	@echo :: building $(BUILD_DIR)
