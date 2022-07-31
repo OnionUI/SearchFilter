@@ -38,6 +38,11 @@ int main(int argc, char** argv)
         flipText("Favorites sorted");
         sleep(1);
     }
+    else if (mode == "favsort2") {
+        tools::sortFavoritesBySystem();
+        flipText("Favorites sorted");
+        sleep(1);
+    }
     else if (mode == "favtools") {
         tools::addFavoritesTools();
         flipText("Shortcuts added");

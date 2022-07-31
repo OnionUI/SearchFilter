@@ -13,7 +13,7 @@
 #define KEY_REPEAT_DELAY 300
 #define KEY_REPEAT_SPEED 30
 
-#define MAIN_FONT "/mnt/SDCARD/miyoo/app/BPreplayBold.otf"
+#define MAIN_FONT "res/Exo-Bold.otf"
 #define LABEL_FONT "/mnt/SDCARD/miyoo/app/Helvetica-Neue-2.ttf"
 
 #define CENTER_NONE 0

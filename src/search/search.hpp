@@ -62,11 +62,12 @@ void addTools(sqlite3* db)
     };
 
     addTool("1. Fix favorites boxart", "boxart");
-    addTool("2. Sort favorites", "favsort");
-    addTool("3. Add tools to favorites", "favtools");
-    addTool("4. Clean recent list", "recents");
-    addTool("5. Install filter", "install_filter");
-    addTool("6. Uninstall filter", "uninstall_filter");
+    addTool("2. Sort favorites (A-Z)", "favsort");
+    addTool("3. Sort favorites (by system)", "favsort2");
+    addTool("4. Add tools to favorites", "favtools");
+    addTool("5. Clean recent list", "recents");
+    addTool("6. Install filter", "install_filter");
+    addTool("7. Uninstall filter", "uninstall_filter");
 }
 
 string totalTextMessage(int total)
@@ -131,14 +132,20 @@ void performSearch(Display* display, string keyword)
         if (name.length() == 0)
             continue;
 
+        // System name
+        string label = trim(config.label);
+        if (label.length() == 0)
+            // Use rom folder name if no label exist
+            label = basename(config.rompath);
+
         if (!exists(cache_path)) {
-            missing_caches.push_back(trim(config.label));
+            missing_caches.push_back(label);
             continue;
         }
 
         vector<RomEntry> result = db::searchEntries(name, keyword);
         int subtotal = result.size();
-        string label = trim(config.label) + " (" + to_string(subtotal) + ")";
+        label += " (" + to_string(subtotal) + ")";
 
         if (subtotal <= 0)
             continue;
@@ -170,7 +177,7 @@ void performSearch(Display* display, string keyword)
 
     updateDisplay(display, totalTextMessage(total), "Done");
 
-    string all_label = "All consoles (" + to_string(total) + ")";
+    string all_label = "All systems (" + to_string(total) + ")";
 
     db::insertRom(db, DB_NAME, {
         .disp = all_label,
@@ -195,7 +202,7 @@ void performSearch(Display* display, string keyword)
     }
 
     if (missing_caches.size() > 0) {
-        string cache_missing_label = "~Missing consoles (" + to_string(missing_caches.size()) + ")";
+        string cache_missing_label = "~Missing caches (" + to_string(missing_caches.size()) + ")";
 
         db::insertRom(db, DB_NAME, {
             .disp = cache_missing_label,

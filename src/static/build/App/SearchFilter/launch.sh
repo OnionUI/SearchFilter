@@ -2,6 +2,7 @@
 echo $0 $*
 progdir=`cd -- "$(dirname "$0")" >/dev/null 2>&1; pwd -P`
 ext=`echo "$(basename "$1")" | awk -F. '{print tolower($NF)}'`
+lib="$progdir/lib:$LD_LIBRARY_PATH"
 
 cd $progdir
 echo "$(date):" $0 $* >> debug.log
@@ -16,19 +17,22 @@ then
     elif [ "$filename" = "1. Fix favorites boxart" ]
     then
         mode="boxart"
-    elif [ "$filename" = "2. Sort favorites" ]
+    elif [ "$filename" = "2. Sort favorites (A-Z)" ]
     then
         mode="favsort"
-    elif [ "$filename" = "3. Add tools to favorites" ]
+    elif [ "$filename" = "3. Sort favorites (by system)" ]
+    then
+        mode="favsort2"
+    elif [ "$filename" = "4. Add tools to favorites" ]
     then
         mode="favtools"
-    elif [ "$filename" = "4. Clean recent list" ]
+    elif [ "$filename" = "5. Clean recent list" ]
     then
         mode="recents"
-    elif [ "$filename" = "5. Install filter" ]
+    elif [ "$filename" = "6. Install filter" ]
     then
         mode="install_filter"
-    elif [ "$filename" = "6. Uninstall filter" ]
+    elif [ "$filename" = "7. Uninstall filter" ]
     then
         mode="uninstall_filter"
     elif [ "$filename" = "~Filter" ]
@@ -58,20 +62,20 @@ then
 
 elif [ "$mode" = "filter" ] || [ "$mode" = "clear_filter" ] || [ "$mode" = "install_filter" ] || [ "$mode" = "uninstall_filter" ] || [ "$mode" = "refresh" ]
 then
-    LD_LIBRARY_PATH="$progdir/lib:$LD_LIBRARY_PATH" ./filter "$mode" "$2" 2>&1 >> debug.log
+    LD_LIBRARY_PATH="$lib" ./filter "$mode" "$2" 2>&1 >> debug.log
 
 elif [ "$mode" = "clear" ]
 then
-    LD_LIBRARY_PATH="$progdir/lib:$LD_LIBRARY_PATH" ./search clear 2>&1 >> debug.log
+    LD_LIBRARY_PATH="$lib" ./search clear 2>&1 >> debug.log
 
 elif [ "$mode" = "search" ]
 then
-    LD_LIBRARY_PATH="$progdir/lib:$LD_LIBRARY_PATH" ./search 2>&1 >> debug.log
+    LD_LIBRARY_PATH="$lib" ./search 2>&1 >> debug.log
 
-elif [ "$mode" = "boxart" ] || [ "$mode" = "favsort" ] || [ "$mode" = "favtools" ] || [ "$mode" = "recents" ]
+elif [ "$mode" = "boxart" ] || [ "$mode" = "favsort" ] || [ "$mode" = "favsort2" ] || [ "$mode" = "favtools" ] || [ "$mode" = "recents" ]
 then
     # Mode must be a tool function
-    LD_LIBRARY_PATH="$progdir/lib:$LD_LIBRARY_PATH" ./tools "$mode" 2>&1 >> debug.log
+    LD_LIBRARY_PATH="$lib" ./tools "$mode" 2>&1 >> debug.log
 
 else
     launch=`echo "$1" | awk '{split($0,a,":"); print a[1]}'`
@@ -83,4 +87,4 @@ else
 fi
 
 cd $progdir
-LD_LIBRARY_PATH="$progdir/lib:$LD_LIBRARY_PATH" ./tools recents --silent 2>&1 >> debug.log
+LD_LIBRARY_PATH="$lib" ./tools recents --silent 2>&1 >> debug.log

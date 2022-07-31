@@ -24,6 +24,7 @@ struct GameJsonEntry
     int type = 5;
     string rompath = "";
     string imgpath = "";
+    string emupath = "";
 
     static GameJsonEntry fromJson(string json_str)
     {
@@ -51,6 +52,14 @@ struct GameJsonEntry
         addInt("type", &entry.type);
         addString("rompath", &entry.rompath);
         addString("imgpath", &entry.imgpath);
+
+        if (entry.rompath.find(":") != string::npos) {
+            vector<string> tokens = split(entry.rompath, ":");
+            entry.launch = tokens[0];
+            entry.rompath = tokens[1];
+        }
+
+        entry.emupath = split(entry.rompath, "/../../")[0];
 
         return entry;
     }

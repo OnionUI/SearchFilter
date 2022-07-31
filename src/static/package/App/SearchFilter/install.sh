@@ -26,6 +26,7 @@ then
         mv .disableRecentlist_ .disableRecentlist
     fi
 
+    rm -f data/data_cache2.db
     rm -f /tmp/SEARCHFILTER_PACKAGE.zip
 else
     rm -f config.json

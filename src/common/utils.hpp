@@ -48,17 +48,17 @@ int exec(string command, string* stdout)
 
 vector<string> split(const string &s, string delim)
 {
+    size_t last = 0;
+    size_t next = 0;
     vector<string> tokens;
-    char *ptr;
-    char* str = (char*)s.c_str();
-    const char* f = delim.c_str();
-
-    // Split the string at every delim
-    ptr = strtok(str, f);
-    while (ptr) {
-        tokens.push_back(string(ptr));
-        ptr = strtok(NULL, f);
+    
+    while ((next = s.find(delim, last)) != string::npos) {
+        tokens.push_back(s.substr(last, next - last));
+        last = next + delim.length();
     }
+
+    if (last < s.length())
+        tokens.push_back(s.substr(last));
 
     return tokens;
 }
