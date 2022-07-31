@@ -37,12 +37,12 @@ package:
 release: all
 	@echo :: $(TARGET) - release
 	@mkdir -p ./release
+	@rm -f ./release/$(RELEASE_NAME).zip
 	@cd ./package && zip -rq ../release/$(RELEASE_NAME).zip App
 
 clean:
 	@rm -rf ./build
 	@rm -rf ./package
-	@rm -f ./release/$(RELEASE_NAME).zip
 	@echo :: $(TARGET) - cleaned
 
 git-clean:
