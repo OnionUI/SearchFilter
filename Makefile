@@ -10,17 +10,18 @@ TOOLCHAIN := ghcr.io/onionui/miyoomini-toolchain
 
 ###########################################################
 
-.PHONY: all setup release clean git-clean with-toolchain
+.PHONY: all release clean git-clean with-toolchain
 
 all: clean package
 
-setup:
+.setup:
 	@mkdir -p $(BUILD_DIR)
 	@cp -R ./src/static/build/. ./build
 	@cp -R ./lib/. $(BUILD_DIR)/lib
 	@rm -f $(BUILD_DIR)/lib/libsqlite3.so
+	@touch .setup
 
-build: setup
+build: .setup
 	@echo :: $(TARGET) - building $(BUILD_DIR)
 	cd ./src/filter && BUILD_DIR=$(BUILD_DIR) VERSION=$(VERSION) make
 	cd ./src/search && BUILD_DIR=$(BUILD_DIR) VERSION=$(VERSION) make
@@ -41,6 +42,7 @@ release: package
 	@cd ./package && zip -rq ../release/$(RELEASE_NAME).zip App
 
 clean:
+	@rm -rf .setup
 	@rm -rf ./build
 	@rm -rf ./package
 	@echo :: $(TARGET) - cleaned
