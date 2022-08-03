@@ -10,9 +10,9 @@ TOOLCHAIN := ghcr.io/onionui/miyoomini-toolchain
 
 ###########################################################
 
-.PHONY: all setup build package release clean git-clean with-toolchain
+.PHONY: all setup release clean git-clean with-toolchain
 
-all: clean setup build package
+all: clean package
 
 setup:
 	@mkdir -p $(BUILD_DIR)
@@ -20,21 +20,21 @@ setup:
 	@cp -R ./lib/. $(BUILD_DIR)/lib
 	@rm -f $(BUILD_DIR)/lib/libsqlite3.so
 
-build:
+build: setup
 	@echo :: $(TARGET) - building $(BUILD_DIR)
 	cd ./src/filter && BUILD_DIR=$(BUILD_DIR) VERSION=$(VERSION) make
 	cd ./src/search && BUILD_DIR=$(BUILD_DIR) VERSION=$(VERSION) make
 	cd ./src/tools && BUILD_DIR=$(BUILD_DIR) VERSION=$(VERSION) make
 #   cd ./src/kbinput && BUILD_DIR=$(BUILD_DIR) VERSION=$(VERSION) make
 
-package:
+package: build
 	@echo :: $(TARGET) - package
 	@mkdir -p ./package
 	@cp -R ./src/static/package/. ./package
 	@cd ./build && zip -rq ../package/App/$(TARGET)/PACKAGE.zip App Emu
 	@sed -i "s/{VERSION}/$(VERSION)/g" ./package/App/$(TARGET)/config.json
 
-release: all
+release: package
 	@echo :: $(TARGET) - release
 	@mkdir -p ./release
 	@rm -f ./release/$(RELEASE_NAME).zip
