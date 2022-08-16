@@ -15,6 +15,7 @@ using std::vector;
 #include "utils.hpp"
 
 #define RECENTLIST_PATH "/mnt/SDCARD/Roms/recentlist.json"
+#define RECENTLIST_HIDDEN_PATH "/mnt/SDCARD/Roms/recentlist-hidden.json"
 #define FAVORITES_PATH "/mnt/SDCARD/Roms/favourite.json"
 
 struct GameJsonEntry

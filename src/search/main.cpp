@@ -32,10 +32,25 @@ int main(int argc, char** argv)
     if (ec == 0) {
         search_icon = IMG_Load("res/icon_search.png");
 
-        if (keyword.length() > 0)
+        if (keyword.length() > 0) {
             putFile(ACTIVE_SEARCH, keyword);
-        else
+            if (exists(EMU_CONFIG_OFF)) {
+                remove(EMU_CONFIG_ON);
+                rename(EMU_CONFIG_OFF, EMU_CONFIG_ON);
+            }
+            if (!exists("state-backup.json"))
+                copyFile("/tmp/state.json", "state-backup.json");
+            copyFile("state.json", "/tmp/state.json");
+        }
+        else {
             remove(ACTIVE_SEARCH);
+            if (exists(EMU_CONFIG_ON)) {
+                remove(EMU_CONFIG_OFF);
+                rename(EMU_CONFIG_ON, EMU_CONFIG_OFF);
+            }
+            copyFile("state-backup.json", "/tmp/state.json");
+            remove("state-backup.json");
+        }
 
         performSearch(display, keyword);
 

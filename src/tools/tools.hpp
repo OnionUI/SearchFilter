@@ -1,4 +1,4 @@
-#if !defined(TOOLS_HPP__)
+#ifndef TOOLS_HPP__
 #define TOOLS_HPP__
 
 #include <string>
@@ -64,7 +64,7 @@ void sortFavoritesBySystem(void)
     });
 }
 
-void addShourtcut(vector<GameJsonEntry>* favorites, string label, string cmd)
+void addShortcut(vector<GameJsonEntry>* favorites, string label, string cmd)
 {
     auto hasShortcut = [cmd](GameJsonEntry entry){
         return entry.rompath == cmd;
@@ -79,9 +79,9 @@ void addFavoritesTools(void)
     vector<GameJsonEntry> favorites = loadGameJsonEntries(FAVORITES_PATH);
     string contents = "";
 
-    addShourtcut(&favorites, "~Fix boxart", "1. Fix favorites boxart");
-    addShourtcut(&favorites, "~Sort alphabetically", "2. Sort favorites (A-Z)");
-    addShourtcut(&favorites, "~Sort by system", "3. Sort favorites (by system)");
+    addShortcut(&favorites, "~Fix boxart", "1. Fix favorites boxart");
+    addShortcut(&favorites, "~Sort alphabetically", "2. Sort favorites (A-Z)");
+    addShortcut(&favorites, "~Sort by system", "3. Sort favorites (by system)");
 
     for (auto &entry : favorites)
         contents += entry.toJson() + "\n";
@@ -89,9 +89,12 @@ void addFavoritesTools(void)
     putFile(FAVORITES_PATH, contents);
 }
 
-void cleanRecentList(bool only_garbage)
+void cleanRecentList(string recentlist_path, bool clean_all)
 {
-    vector<GameJsonEntry> recents = loadGameJsonEntries(RECENTLIST_PATH);
+    if (!exists(recentlist_path))
+        return;
+
+    vector<GameJsonEntry> recents = loadGameJsonEntries(recentlist_path);
     string contents = "";
 
     for (auto &entry : recents) {
@@ -100,13 +103,13 @@ void cleanRecentList(bool only_garbage)
             entry.launch = tokens[0];
             entry.rompath = tokens[1];
         }
-        else if (entry.launch == LAUNCH_PATH || getExtension(entry.rompath) == "miyoocmd" || (!only_garbage && entry.type == 3)) {
+        else if (entry.launch == LAUNCH_PATH || getExtension(entry.rompath) == "miyoocmd" || (clean_all && entry.type == 3)) {
             continue;
         }
         contents += entry.toJson() + "\n";
     }
 
-    putFile(RECENTLIST_PATH, contents);
+    putFile(recentlist_path, contents);
 }
 
 } // namespace tools

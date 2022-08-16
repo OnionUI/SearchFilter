@@ -204,7 +204,9 @@ string getFile(string file_path)
 
 void putFile(string file_path, string contents)
 {
-    system(string("mkdir -p '" + dirname(file_path) + "'").c_str());
+    string dir_name = dirname(file_path);
+    if (dir_name.length() > 0)
+        system(string("mkdir -p '" + dir_name + "'").c_str());
     ofstream file(file_path, ios::trunc);
     if (file.is_open()) {
         file << contents;

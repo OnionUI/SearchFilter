@@ -13,20 +13,35 @@ using std::string;
 
 int main(int argc, char** argv)
 {
-    if (argc >= 2 && string(argv[1]) == "--version") {
-        std::cout << VERSION;
-        exit(0);
+    bool show_display = false;
+    bool clean_all = false;
+    string mode = "unknown";
+    
+    for (int i = 1; i < argc; i++) {
+        if (string(argv[i]) == "--version") {
+            std::cout << VERSION;
+            exit(0);
+        }
+        else if (string(argv[i]) == "--display") {
+            show_display = true;
+        }
+        else if (string(argv[i]) == "--clean_all") {
+            clean_all = true;
+        }
+        else if (mode == "unknown") {
+            mode = argv[i];
+        }
+        else {
+            std::cerr << "Unknown argument: " << argv[i] << std::endl;
+            exit(1);
+        }
     }
 
-    bool no_display = argc >= 3 && string(argv[2]) == "--silent";
-
-    Display* display = no_display ? NULL : new Display();
+    Display* display = show_display ? new Display() : NULL;
     auto flipText = [display](string text) {
         if (display)
             display->flipText(text);
     };
-
-    string mode = argc >= 2 ? string(argv[1]) : "";
 
     if (mode == "boxart") {
         tools::fixFavoritesBoxart();
@@ -49,7 +64,8 @@ int main(int argc, char** argv)
         sleep(1);
     }
     else if (mode == "recents") {
-        tools::cleanRecentList(no_display);
+        tools::cleanRecentList(RECENTLIST_PATH, clean_all);
+        tools::cleanRecentList(RECENTLIST_HIDDEN_PATH, clean_all);
         flipText("Recent list cleaned");
         sleep(1);
     }

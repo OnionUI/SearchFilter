@@ -12,7 +12,7 @@ TOOLCHAIN := ghcr.io/onionui/miyoomini-toolchain
 
 .PHONY: all release clean git-clean with-toolchain
 
-all: clean package
+all: clean build
 
 .setup:
 	@mkdir -p $(BUILD_DIR)
@@ -23,28 +23,20 @@ all: clean package
 
 build: .setup
 	@echo :: $(TARGET) - building $(BUILD_DIR)
-	cd ./src/filter && BUILD_DIR=$(BUILD_DIR) VERSION=$(VERSION) make
+#	cd ./src/filter && BUILD_DIR=$(BUILD_DIR) VERSION=$(VERSION) make
 	cd ./src/search && BUILD_DIR=$(BUILD_DIR) VERSION=$(VERSION) make
 	cd ./src/tools && BUILD_DIR=$(BUILD_DIR) VERSION=$(VERSION) make
 #   cd ./src/kbinput && BUILD_DIR=$(BUILD_DIR) VERSION=$(VERSION) make
 
-package: build
-	@echo :: $(TARGET) - package
-	@mkdir -p ./package
-	@cp -R ./src/static/package/. ./package
-	@cd ./build && zip -rq ../package/App/$(TARGET)/PACKAGE.zip App Emu
-	@sed -i "s/{VERSION}/$(VERSION)/g" ./package/App/$(TARGET)/config.json
-
-release: package
+release: build
 	@echo :: $(TARGET) - release
 	@mkdir -p ./release
 	@rm -f ./release/$(RELEASE_NAME).zip
-	@cd ./package && zip -rq ../release/$(RELEASE_NAME).zip App
+	@cd ./build && zip -rq ../release/$(RELEASE_NAME).zip App
 
 clean:
 	@rm -rf .setup
 	@rm -rf ./build
-	@rm -rf ./package
 	@echo :: $(TARGET) - cleaned
 
 git-clean:

@@ -1,4 +1,4 @@
-#if !defined(SEARCH_HPP__)
+#ifndef SEARCH_HPP__
 #define SEARCH_HPP__
 
 #include <iostream>
@@ -15,6 +15,8 @@ using std::vector;
 #include "../common/ConfigEmu.hpp"
 
 #define ACTIVE_SEARCH "active_search"
+#define EMU_CONFIG_ON "/mnt/SDCARD/Emu/SEARCH/config.json"
+#define EMU_CONFIG_OFF "/mnt/SDCARD/Emu/SEARCH/_config.json"
 
 const string DB_NAME = "data";
 const string DB_DIR = fullpath(DB_NAME);
@@ -100,9 +102,9 @@ void performSearch(Display* display, string keyword)
             .path = "search",
             .imgpath = DB_DIR + "/Imgs/Enter search term....png"
         });
-        addTools(db);
+        // addTools(db);
         total_lines += 2;
-        db::addEmptyLines(db, DB_NAME, total_lines);
+        // db::addEmptyLines(db, DB_NAME, total_lines);
         sqlite3_close(db);
         return;
     }
@@ -223,7 +225,7 @@ void performSearch(Display* display, string keyword)
         }
     }
 
-    addTools(db);
+    // addTools(db);
     total_lines++;
 
     db::insertRom(db, DB_NAME, {
@@ -240,7 +242,7 @@ void performSearch(Display* display, string keyword)
     });
     total_lines++;
 
-    db::addEmptyLines(db, DB_NAME, total_lines);
+    // db::addEmptyLines(db, DB_NAME, total_lines);
 
     sqlite3_close(db);
 }
