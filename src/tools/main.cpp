@@ -1,4 +1,4 @@
-#if !defined(VERSION)
+#ifndef VERSION
 #define VERSION ""
 #endif
 
@@ -39,35 +39,32 @@ int main(int argc, char** argv)
 
     Display* display = show_display ? new Display() : NULL;
     auto flipText = [display](string text) {
-        if (display)
+        if (display) {
             display->flipText(text);
+            sleep(1);
+        }
     };
 
     if (mode == "boxart") {
         tools::fixFavoritesBoxart();
         flipText("Boxart fixed");
-        sleep(1);
     }
     else if (mode == "favsort") {
         tools::sortFavorites();
         flipText("Favorites sorted");
-        sleep(1);
     }
     else if (mode == "favsort2") {
         tools::sortFavoritesBySystem();
         flipText("Favorites sorted");
-        sleep(1);
     }
     else if (mode == "favtools") {
         tools::addFavoritesTools();
         flipText("Shortcuts added");
-        sleep(1);
     }
     else if (mode == "recents") {
         tools::cleanRecentList(RECENTLIST_PATH, clean_all);
         tools::cleanRecentList(RECENTLIST_HIDDEN_PATH, clean_all);
         flipText("Recent list cleaned");
-        sleep(1);
     }
 
     delete display;
