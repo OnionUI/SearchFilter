@@ -137,4 +137,15 @@ vector<ConfigEmu> getEmulatorConfigs(void)
     return configs;
 }
 
+ConfigEmu getEmulatorConfig(string emu_path)
+{
+    ConfigEmu config;
+    string config_path = emu_path + "/config.json";
+
+    if (!exists(config_path))
+        return config;
+
+    return ConfigEmu::load(config_path);
+}
+
 #endif // CONFIG_HPP__

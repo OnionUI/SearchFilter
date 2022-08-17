@@ -5,28 +5,59 @@
 #include <vector>
 #include <algorithm>
 #include <json/json.h>
+#include <unordered_map>
 
 using std::sort;
 using std::any_of;
 using std::string;
 using std::vector;
+using std::unordered_map;
+using std::count;
 
 #include "../common/utils.hpp"
 #include "../common/GameJsonEntry.hpp"
+#include "../common/ConfigEmu.hpp"
 
 #define APP_ROOT "/mnt/SDCARD/Emu/SEARCH/../../App/SearchFilter"
 #define LAUNCH_PATH APP_ROOT "/launch.sh"
 
 namespace tools {
 
-void fixFavoritesBoxart(void)
+void fixFavorites(void)
 {
     vector<GameJsonEntry> favorites = loadGameJsonEntries(FAVORITES_PATH);
+    unordered_map<string, ConfigEmu> emu_configs;
+    vector<string> added_rompaths;
+    vector<string> added_labels;
     string contents = "";
 
     for (auto &entry : favorites) {
-        // Entries are automatically fixed when loaded
-        contents += entry.toJson() + "\n";
+        if (emu_configs.find(entry.emupath) == emu_configs.end())
+            emu_configs[entry.emupath] = getEmulatorConfig(entry.emupath);
+
+        string romname = removeExtension(basename(entry.rompath));
+
+        entry.label = romname;
+
+        string imgpath = entry.emupath + "/";
+        if (emu_configs[entry.emupath].imgpath.length() > 0)
+            imgpath += emu_configs[entry.emupath].imgpath + "/";
+        imgpath += romname + ".png";
+        entry.imgpath = imgpath;
+
+
+        if (std::count(added_rompaths.begin(), added_rompaths.end(), entry.rompath) == 0) {
+            int num = 1;
+            string label = entry.label;
+            while (std::count(added_labels.begin(), added_labels.end(), label) != 0)
+                label = entry.label + " (" + to_string(++num) + ")";
+            if (num > 1)
+                entry.label = label;
+            added_labels.push_back(entry.label);
+            added_rompaths.push_back(entry.rompath);
+            std::cout << entry.label << ": " << imgpath << std::endl;
+            contents += entry.toJson() + "\n";
+        }
     }
 
     putFile(FAVORITES_PATH, contents);

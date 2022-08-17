@@ -45,9 +45,9 @@ int main(int argc, char** argv)
         }
     };
 
-    if (mode == "boxart") {
-        tools::fixFavoritesBoxart();
-        flipText("Boxart fixed");
+    if (mode == "boxart" || mode == "favfix") {
+        tools::fixFavorites();
+        flipText("Favorites fixed");
     }
     else if (mode == "favsort") {
         tools::sortFavorites();

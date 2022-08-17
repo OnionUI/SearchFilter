@@ -60,7 +60,9 @@ struct GameJsonEntry
             entry.rompath = tokens[1];
         }
 
-        entry.emupath = split(entry.rompath, "/../../")[0];
+        int pos;
+        if ((pos = findNth(entry.rompath, "/", 4)) != std::string::npos)
+            entry.emupath = entry.rompath.substr(0, pos);
 
         return entry;
     }
@@ -79,7 +81,8 @@ struct GameJsonEntry
     }
 };
 
-vector<GameJsonEntry> loadGameJsonEntries(string json_path) {
+vector<GameJsonEntry> loadGameJsonEntries(string json_path)
+{
     vector<GameJsonEntry> entries;
     
     if (!exists(json_path))

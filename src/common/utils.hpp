@@ -129,6 +129,22 @@ string wrapQuotes(const string &s, const string quote_char = "\"") {
     return quote_char + s + quote_char;
 }
 
+int findNth(const std::string& str, const std::string& findMe, int nth)
+{
+    size_t  pos = 0;
+    int     cnt = 0;
+
+    while( cnt != nth )
+    {
+        pos+=1;
+        pos = str.find(findMe, pos);
+        if ( pos == std::string::npos )
+            return -1;
+        cnt++;
+    }
+    return pos;
+}
+
 string tolower(const string &s)
 {
     string result = s;
@@ -154,6 +170,14 @@ string getExtension(string path)
     if (pos != string::npos)
         return path.substr(pos + 1);
     return "";
+}
+
+string removeExtension(string path)
+{
+    int pos = path.find_last_of(".");
+    if (pos != string::npos)
+        return path.substr(0, pos);
+    return path;
 }
 
 string fullpath(string root, string rel = "")
