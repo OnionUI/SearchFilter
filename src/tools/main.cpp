@@ -22,15 +22,12 @@ int main(int argc, char** argv)
             std::cout << VERSION;
             exit(0);
         }
-        else if (string(argv[i]) == "--display") {
+        else if (string(argv[i]) == "--display")
             show_display = true;
-        }
-        else if (string(argv[i]) == "--clean_all") {
+        else if (string(argv[i]) == "--clean_all")
             clean_all = true;
-        }
-        else if (mode == "unknown") {
+        else if (mode == "unknown")
             mode = argv[i];
-        }
         else {
             std::cerr << "Unknown argument: " << argv[i] << std::endl;
             exit(1);

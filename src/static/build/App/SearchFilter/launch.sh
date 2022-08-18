@@ -45,7 +45,9 @@ echo "launch mode:" $mode
 
 if [ "$mode" = "noop" ]; then
     echo noop >> $progdir/debug.log
-
+elif [ "${mode:0:8}" = "setstate" ]; then
+    label="${mode:9}"
+    LD_LIBRARY_PATH="$lib" ./search setstate "$label" 2>&1 >> debug.log
 elif [ "$mode" = "filter" ] || [ "$mode" = "clear_filter" ] || [ "$mode" = "install_filter" ] || [ "$mode" = "uninstall_filter" ] || [ "$mode" = "refresh" ]; then
     LD_LIBRARY_PATH="$lib" ./filter "$mode" "$2" 2>&1 >> debug.log
 elif [ "$mode" = "clear" ]; then

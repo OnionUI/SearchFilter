@@ -12,7 +12,8 @@ TOOLCHAIN := ghcr.io/onionui/miyoomini-toolchain
 
 .PHONY: all release clean git-clean with-toolchain
 
-all: clean build
+all: build
+dev: clean build
 
 .setup:
 	@mkdir -p $(BUILD_DIR)

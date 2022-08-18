@@ -20,6 +20,7 @@ using std::ifstream;
 
 struct ConfigEmu
 {
+    int id = -1;
     string path = "";
     string label = "";
     string icon = "";
@@ -33,10 +34,12 @@ struct ConfigEmu
     int hidebios = 0;
     string extlist = "";
 
-    static ConfigEmu load(string json_path)
+    static ConfigEmu load(string json_path, int _id)
     {
         ConfigEmu config;
         Json::Value root;
+
+        config.id = _id;
 
         if (!exists(json_path))
             return config;
@@ -81,6 +84,11 @@ struct ConfigEmu
         return config;
     }
 
+    static ConfigEmu load(string json_path)
+    {
+        return ConfigEmu::load(json_path, -1);
+    }
+
     string toJson(bool new_lines = true)
     {
         string json_str = "{";
@@ -121,8 +129,9 @@ struct ConfigEmu
 vector<ConfigEmu> getEmulatorConfigs(void)
 {
     vector<ConfigEmu> configs;
+    int index = 0;
 
-    subdirForEach(EMU_PATH, [&configs](string name) {
+    subdirForEach(EMU_PATH, [&configs, &index](string name) {
         string config_path = CONFIG_PATH(name);
 
         if (name == IGNORED_EMU)
@@ -131,7 +140,7 @@ vector<ConfigEmu> getEmulatorConfigs(void)
         if (!exists(config_path))
             return;
 
-        configs.push_back(ConfigEmu::load(config_path));
+        configs.push_back(ConfigEmu::load(config_path, index++));
     });
 
     return configs;

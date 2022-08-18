@@ -115,7 +115,7 @@ void performSearch(Display* display, string keyword)
     int current_emu = 0;
     int total_emu = configs.size();
 
-    vector<string> missing_caches;
+    vector<ConfigEmu> missing_caches;
 
     string status_main = "0 games";
     string status_sub = "";
@@ -141,7 +141,7 @@ void performSearch(Display* display, string keyword)
             label = basename(config.rompath);
 
         if (!exists(cache_path)) {
-            missing_caches.push_back(label);
+            missing_caches.push_back(config);
             continue;
         }
 
@@ -214,10 +214,10 @@ void performSearch(Display* display, string keyword)
         });
         total_lines++;
 
-        for (auto &label : missing_caches) {
+        for (auto &config : missing_caches) {
             db::insertRom(db, DB_NAME, {
-                .disp = label,
-                .path = "noop",
+                .disp = trim(config.label),
+                .path = "setstate " + config.label,
                 .imgpath = DB_DIR + "/../res/help_unavailable.png",
                 .type = 0,
                 .ppath = cache_missing_label

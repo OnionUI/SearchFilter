@@ -5,8 +5,10 @@
 #include <iostream>
 #include <string>
 #include <stdio.h>
+#include <vector>
 
 using std::string;
+using std::vector;
 
 #include "../common/display.hpp"
 #include "../common/utils.hpp"
@@ -19,7 +21,19 @@ int main(int argc, char** argv)
 {
     if (argc >= 2 && string(argv[1]) == "--version") {
         std::cout << VERSION;
-        exit(0);
+        return 0;
+    }
+
+    if (argc >= 3 && string(argv[1]) == "setstate") {
+        string label = string(argv[2]);
+        std::cout << "label = " << label << std::endl;
+        vector<string> state_json = split(getFile("/tmp/state.json"), "]");
+        stringstream ss;
+        ss << state_json[0];
+        ss << ",{\"title\":-1,\"type\":5,\"currpos\":0,\"pagestart\":0,\"pageend\":5,\"emuname\":\"" << label << "\"}]}";
+        std::cout << "state = " << ss.str() << std::endl;
+        putFile("/tmp/state.json", ss.str());
+        return 0;
     }
 
     Display* display = new Display();
