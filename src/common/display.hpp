@@ -75,6 +75,7 @@ public:
     SDL_Color COLOR_SELECTED = {51, 51, 51};
 
     float time_step = 1000.f / FRAMES_PER_SECOND;
+    SDL_Surface* video = NULL;
     SDL_Surface* screen = NULL;
     DisplayFonts fonts;
     Uint8 keystate[320] = {};
@@ -82,25 +83,14 @@ public:
 
     Display()
     {
-        if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-            std::cerr << "Could not initialize SDL: " << SDL_GetError() << std::endl;
-            exit(1);
-        }
+		SDL_Init(SDL_INIT_VIDEO);
+		SDL_ShowCursor(SDL_DISABLE);
+		SDL_EnableKeyRepeat(300, 50);
+		TTF_Init();
 
-        // Hide the cursor
-        SDL_ShowCursor(SDL_DISABLE);
+		video = SDL_SetVideoMode(640, 480, 32, SDL_HWSURFACE);
+		screen = SDL_CreateRGBSurface(SDL_HWSURFACE, 640, 480, 32, 0, 0, 0, 0);
 
-        // Enable Unicode translation
-        SDL_EnableUNICODE(1);
-
-        if (!(screen = SDL_SetVideoMode(640, 480, 32, SDL_SWSURFACE))) {
-            std::cerr << "Could not set video mode: " << SDL_GetError() << std::endl;
-            SDL_Quit();
-            exit(1);
-        }
-
-        // Load font
-        TTF_Init();
         fonts = {
             .display = TTF_OpenFont(MAIN_FONT, 40),
             .regular = TTF_OpenFont(MAIN_FONT, 24),
@@ -297,7 +287,8 @@ void Display::clear(void)
 
 void Display::flip(void)
 {
-    SDL_Flip(screen);
+    SDL_BlitSurface(screen, NULL, video, NULL);
+    SDL_Flip(video);
 }
 
 #endif // HPP_DISPLAY

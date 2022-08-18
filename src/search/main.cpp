@@ -44,12 +44,14 @@ int main(int argc, char** argv)
         }
         else {
             remove(ACTIVE_SEARCH);
-            if (exists(EMU_CONFIG_ON)) {
-                remove(EMU_CONFIG_OFF);
-                rename(EMU_CONFIG_ON, EMU_CONFIG_OFF);
+            if (!exists(".stayAfterClear")) {
+                if (exists(EMU_CONFIG_ON)) {
+                    remove(EMU_CONFIG_OFF);
+                    rename(EMU_CONFIG_ON, EMU_CONFIG_OFF);
+                }
+                copyFile("state-backup.json", "/tmp/state.json");
+                remove("state-backup.json");
             }
-            copyFile("state-backup.json", "/tmp/state.json");
-            remove("state-backup.json");
         }
 
         performSearch(display, keyword);
