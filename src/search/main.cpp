@@ -17,6 +17,10 @@ using std::vector;
 
 #include "search.hpp"
 
+#define EMU_DIR "/mnt/SDCARD/Emu/SEARCH"
+#define EMU_CONFIG_DST EMU_DIR "/config.json"
+#define EMU_CONFIG_SRC "/mnt/SDCARD/.tmp_update/res/search_config.json"
+
 int main(int argc, char** argv)
 {
     if (argc >= 2 && string(argv[1]) == "--version") {
@@ -48,23 +52,21 @@ int main(int argc, char** argv)
 
         if (keyword.length() > 0) {
             putFile(ACTIVE_SEARCH, keyword);
-            if (exists(EMU_CONFIG_OFF)) {
-                remove(EMU_CONFIG_ON);
-                rename(EMU_CONFIG_OFF, EMU_CONFIG_ON);
+            if (!exists(EMU_CONFIG_DST)) {
+                system("mkdir -p " EMU_DIR);
+                copyFile(EMU_CONFIG_SRC, EMU_CONFIG_DST);
             }
-            if (!exists("state-backup.json"))
-                copyFile("/tmp/state.json", "state-backup.json");
-            copyFile("state.json", "/tmp/state.json");
+            if (!exists("res/state-backup.json"))
+                copyFile("/tmp/state.json", "res/state-backup.json");
+            copyFile("res/search_state.json", "/tmp/state.json");
         }
         else {
             remove(ACTIVE_SEARCH);
-            if (!exists(".stayAfterClear")) {
-                if (exists(EMU_CONFIG_ON)) {
-                    remove(EMU_CONFIG_OFF);
-                    rename(EMU_CONFIG_ON, EMU_CONFIG_OFF);
-                }
-                copyFile("state-backup.json", "/tmp/state.json");
-                remove("state-backup.json");
+            if (!exists("config/.keepSearch")) {
+                if (exists(EMU_CONFIG_DST))
+                    remove(EMU_CONFIG_DST);
+                copyFile("res/state-backup.json", "/tmp/state.json");
+                remove("res/state-backup.json");
             }
         }
 

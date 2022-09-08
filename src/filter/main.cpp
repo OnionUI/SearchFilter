@@ -20,37 +20,19 @@ int main(int argc, char *argv[])
     string mode = argc >= 2 ? string(argv[1]) : "";
     string emu_path = argc >= 3 ? string(argv[2]) : "";
 
-    if (mode == "refresh") {
+    if (mode == "refresh")
         refreshRoms(emu_path);
-        return 0;
-    }
-    else if (mode == "clear_filter") {
+    else if (mode == "clear_filter")
         clearFilter(emu_path);
-        return 0;
-    }
-
-    Display* display = new Display();
-    string message = "";
-
-    if (mode == "install_filter") {
-        display->flipText("Installing filter...");
+    else if (mode == "install_filter")
         installFilter();
-        message = "Filter installed";
-    }
-    else if (mode == "uninstall_filter") {
-        display->flipText("Uninstalling filter...");
+    else if (mode == "uninstall_filter")
         uninstallFilter();
-        message = "Filter uninstalled";
-    }
     else if (mode == "filter") {
+        Display* display = new Display();
         applyFilter(display, emu_path);
+        delete display;
     }
 
-    if (message.length() > 0) {
-        display->flipText(message);
-        sleep(1);
-    }
-
-    delete display;
     return 0;
 }

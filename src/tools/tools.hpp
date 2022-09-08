@@ -18,7 +18,7 @@ using std::count;
 #include "../common/GameJsonEntry.hpp"
 #include "../common/ConfigEmu.hpp"
 
-#define APP_ROOT "/mnt/SDCARD/Emu/SEARCH/../../App/SearchFilter"
+#define APP_ROOT "/mnt/SDCARD/Emu/SEARCH/../../App/Search"
 #define LAUNCH_PATH APP_ROOT "/launch.sh"
 
 namespace tools {
