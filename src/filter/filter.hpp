@@ -18,9 +18,13 @@ using std::regex_replace;
 #include "../common/GameJsonEntry.hpp"
 #include "../kbinput/keyboard.hpp"
 
-#define PROXY_PATH "../../App/SearchFilter/proxy.sh"
-#define PROXY_RE "\\.\\.\\/\\.\\.\\/App\\/SearchFilter\\/proxy\\.sh"
+#define PROXY_PATH "../../.tmp_update/proxy.sh"
+#define PROXY_RE "\\.\\.\\/\\.\\.\\/.*?\\/proxy\\.sh"
 #define ACTIVE_FILTER(emu_path) emu_path + "/active_filter"
+
+#define SCRIPT_FILTER "#!/bin/sh\ncd /mnt/SDCARD/.tmp_update; ./bin/filter filter \"$2\""
+#define SCRIPT_CLEAR_FILTER "#!/bin/sh\ncd /mnt/SDCARD/.tmp_update; ./bin/filter clear_filter \"$2\""
+#define SCRIPT_REFRESH "#!/bin/sh\ncd /mnt/SDCARD/.tmp_update; ./bin/filter refresh \"$2\""
 
 string commandPath(string path, string cmd)
 {
@@ -83,9 +87,10 @@ void installFilter(void)
 
         string full_path = dirname(config.path) + "/" + config.rompath;
 
-        if (exists(full_path) && !dirEmpty(full_path)) {
-            putFile(commandPath(full_path, "Filter"), "");
-            putFile(commandPath(full_path, "Refresh roms"), "");
+        if (exists(full_path)) {
+            putFile(commandPath(full_path, "Filter"), SCRIPT_FILTER);
+            remove(commandPath(full_path, "Clear filter"));
+            putFile(commandPath(full_path, "Refresh roms"), SCRIPT_REFRESH);
         }
 
         sqlite3* db;
@@ -103,8 +108,13 @@ void installFilter(void)
     }
 
     // Fix paths of favorites and recentlist
+    unpatchGamelist(FAVORITES_PATH);
+    unpatchGamelist(RECENTLIST_PATH);
+    unpatchGamelist(RECENTLIST_HIDDEN_PATH);
+
     patchGamelist(FAVORITES_PATH);
     patchGamelist(RECENTLIST_PATH);
+    patchGamelist(RECENTLIST_HIDDEN_PATH);
 }
 
 void uninstallFilter(void)
@@ -122,6 +132,7 @@ void uninstallFilter(void)
 
         string full_path = dirname(config.path) + "/" + config.rompath;
         remove(commandPath(full_path, "Filter"));
+        remove(commandPath(full_path, "Clear filter"));
         remove(commandPath(full_path, "Refresh roms"));
 
         sqlite3* db;
@@ -138,7 +149,8 @@ void uninstallFilter(void)
 
     // Fix paths of favorites and recentlist
     unpatchGamelist(FAVORITES_PATH);
-    unpatchGamelist(RECENTLIST_PATH);    
+    unpatchGamelist(RECENTLIST_PATH);
+    unpatchGamelist(RECENTLIST_HIDDEN_PATH);
 }
 
 void refreshRoms(string emu_path)
@@ -180,6 +192,8 @@ void clearFilter(string emu_path)
     db::removeCommands(db, name);
     addCommand(db, name, full_path, "Filter");
     addCommand(db, name, full_path, "Refresh roms");
+
+    remove(commandPath(full_path, "Clear filter"));
 
     sqlite3_close(db);
 }
@@ -237,6 +251,8 @@ void applyFilter(Display* display, string emu_path)
     addCommand(db, name, full_path, "Filter", "~Filter: " + keyword);
     addCommand(db, name, full_path, "Clear filter");
     addCommand(db, name, full_path, "Refresh roms");
+    
+    putFile(commandPath(full_path, "Clear filter"), SCRIPT_CLEAR_FILTER);
 
     int total_lines = db::countRootEntries(db, name);
     db::addEmptyLines(db, name, total_lines);

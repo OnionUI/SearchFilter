@@ -15,12 +15,10 @@ using std::vector;
 #include "../common/ConfigEmu.hpp"
 
 #define ACTIVE_SEARCH "active_search"
-#define EMU_CONFIG_ON "/mnt/SDCARD/Emu/SEARCH/config.json"
-#define EMU_CONFIG_OFF "/mnt/SDCARD/Emu/SEARCH/_config.json"
 
 const string DB_NAME = "data";
-const string DB_DIR = fullpath(DB_NAME);
-const string DB_PATH = DB_NAME + "/" + CACHE_NAME(DB_NAME);
+const string DB_DIR = fullpath("/mnt/SDCARD/App/Search/" + DB_NAME);
+const string DB_PATH = DB_DIR + "/" + CACHE_NAME(DB_NAME);
 
 static SDL_Surface* search_icon = NULL;
 
@@ -81,6 +79,8 @@ void performSearch(Display* display, string keyword)
 {
     if (exists(DB_PATH))
         remove(DB_PATH.c_str());
+
+    string path = DB_PATH;
 
     if (!db::create(DB_PATH, DB_NAME)) {
         std::cerr << "Couldn't create database" << std::endl;
@@ -193,7 +193,7 @@ void performSearch(Display* display, string keyword)
         db::insertRom(db, DB_NAME, {
             .disp = "No results",
             .path = "clear",
-            .imgpath = DB_DIR + "/../res/help_clear_search.png",
+            .imgpath = "/mnt/SDCARD/.tmp_update/res/help_clear_search.png",
             .type = 0,
             .ppath = all_label
         });
@@ -218,7 +218,7 @@ void performSearch(Display* display, string keyword)
             db::insertRom(db, DB_NAME, {
                 .disp = trim(config.label),
                 .path = "setstate " + config.label,
-                .imgpath = DB_DIR + "/../res/help_unavailable.png",
+                .imgpath = "/mnt/SDCARD/.tmp_update/res/help_unavailable.png",
                 .type = 0,
                 .ppath = cache_missing_label
             });
@@ -231,7 +231,7 @@ void performSearch(Display* display, string keyword)
     db::insertRom(db, DB_NAME, {
         .disp = "Clear search",
         .path = "clear",
-        .imgpath = DB_DIR + "/../res/help_clear_search.png"
+        .imgpath = "/mnt/SDCARD/.tmp_update/res/help_clear_search.png"
     });
     total_lines++;
 
