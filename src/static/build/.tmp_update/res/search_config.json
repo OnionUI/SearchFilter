@@ -1,6 +1,6 @@
 {
 "label":" Search ",
-"icon":"../../.tmp_update/res/icon_search_p.png",
+"icon":"../../Icons/search.png",
 "iconsel":"",
 "launch":"../../App/Search/launch.sh",
 "rompath":"../../App/Search/data",

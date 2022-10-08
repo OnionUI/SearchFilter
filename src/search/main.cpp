@@ -48,7 +48,7 @@ int main(int argc, char** argv)
     else ec = kbinput(display, "Enter search term", keyword, &keyword);
 
     if (ec == 0) {
-        search_icon = IMG_Load("res/icon_search.png");
+        search_icon = IMG_Load("/mnt/SDCARD/Icons/app/search.png");
 
         if (keyword.length() > 0) {
             putFile(ACTIVE_SEARCH, keyword);
