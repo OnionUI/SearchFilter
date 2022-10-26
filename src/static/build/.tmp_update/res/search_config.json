@@ -1,7 +1,7 @@
 {
 "label":" Search ",
 "icon":"../../Icons/search.png",
-"iconsel":"",
+"iconsel":"../../Icons/search.png",
 "launch":"../../App/Search/launch.sh",
 "rompath":"../../App/Search/data",
 "imgpath":"../../App/Search/data/Imgs",
