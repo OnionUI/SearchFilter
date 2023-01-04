@@ -145,7 +145,7 @@ void performSearch(Display* display, string keyword)
             continue;
         }
 
-        vector<RomEntry> result = db::searchEntries(name, keyword);
+        vector<RomEntry> result = db::searchEntries(cache_path, keyword);
         int subtotal = result.size();
         label += " (" + to_string(subtotal) + ")";
 

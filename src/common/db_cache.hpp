@@ -19,10 +19,7 @@ using std::vector;
 
 #include "utils.hpp"
 
-#define ROMS_PATH "/mnt/SDCARD/Roms"
-#define ROM_PATH(name) ROMS_PATH "/" + name
 #define CACHE_NAME(name) name + "_cache2.db"
-#define CACHE_PATH(name) ROM_PATH(name) + "/" + CACHE_NAME(name)
 #define TABLE_NAME(name) name + "_roms"
 
 struct RomEntry
@@ -243,7 +240,7 @@ bool removeCommands(sqlite3* db, string name)
     return execSql(db, sql::delete_commands(name));
 }
 
-vector<RomEntry> searchEntries(string name, string keyword)
+vector<RomEntry> searchEntries(string path, string keyword)
 {
     int rc;
     vector<RomEntry> entries;
@@ -251,7 +248,7 @@ vector<RomEntry> searchEntries(string name, string keyword)
     if (keyword.length() == 0)
         return entries;
 
-    string path = CACHE_PATH(name);
+    string name = basename(dirname(path));
     string table = TABLE_NAME(name);
     sqlite3* db;
     sqlite3_stmt* stmt;
