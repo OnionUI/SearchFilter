@@ -31,6 +31,12 @@ string commandPath(string path, string cmd)
     return path + "/~" + cmd + ".miyoocmd";
 }
 
+string cachePath(ConfigEmu config)
+{
+    string rom_path = fullpath(dirname(config.path), config.rompath);
+    return rom_path + "/" + basename(rom_path) + "_cache2.db";
+}
+
 void addCommand(sqlite3* db, string name, string path, string cmd, string disp = "")
 {
     db::insertRom(db, name, {
@@ -95,7 +101,7 @@ void installFilter(void)
 
         sqlite3* db;
         string name = basename(config.rompath);
-        string cache_path = CACHE_PATH(name);
+        string cache_path = cachePath(config);
 
         if (!exists(cache_path) || !db::open(&db, cache_path))
             continue;
@@ -137,7 +143,7 @@ void uninstallFilter(void)
 
         sqlite3* db;
         string name = basename(config.rompath);
-        string cache_path = CACHE_PATH(name);
+        string cache_path = cachePath(config);
 
         if (!db::open(&db, cache_path))
             continue;
@@ -161,8 +167,7 @@ void refreshRoms(string emu_path)
         return;
 
     ConfigEmu config = ConfigEmu::load(config_path);
-    string name = basename(config.rompath);
-    string cache_path = CACHE_PATH(name);
+    string cache_path = cachePath(config);
 
     remove(cache_path);
 }
@@ -176,7 +181,7 @@ void clearFilter(string emu_path)
 
     ConfigEmu config = ConfigEmu::load(config_path);
     string name = basename(config.rompath);
-    string cache_path = CACHE_PATH(name);
+    string cache_path = cachePath(config);
 
     sqlite3* db;
 
@@ -234,7 +239,7 @@ void applyFilter(Display* display, string emu_path)
 
     ConfigEmu config = ConfigEmu::load(config_path);
     string name = basename(config.rompath);
-    string cache_path = CACHE_PATH(name);
+    string cache_path = cachePath(config);
 
     sqlite3* db;
 
