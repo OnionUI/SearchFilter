@@ -39,4 +39,9 @@ else
 fi
 
 cd $progdir
-./tools recents
+if [ -f ./tools ]; then
+    ./tools recents
+else
+    cd /mnt/SDCARD/.tmp_update
+    ./bin/tools recents
+fi
