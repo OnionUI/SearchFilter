@@ -3,3 +3,11 @@
 /release/
 /package/
 /.setup
+!/src/filter
+filter
+!/src/search
+search
+!/src/kbinput
+kbinput
+!/src/tools
+tools

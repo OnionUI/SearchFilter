@@ -84,10 +84,13 @@ void installFilter(void)
 
     for (auto &config : configs) {
         // Only patch configs we can restore, and not already patched
-        if (config.launch == "launch.sh" && config.launch != PROXY_PATH) {
+        if (config.launch == "launch.sh") {
             config.launch = PROXY_PATH;
-            if (config.extlist != "")
+
+            if (config.extlist != "" &&
+                config.extlist.find("miyoocmd") == std::string::npos)
                 config.extlist += "|miyoocmd";
+
             config.save();
         }
 
