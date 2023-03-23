@@ -1,30 +1,33 @@
 #if !defined(FILTER_HPP__)
 #define FILTER_HPP__
 
+#include <algorithm>
+#include <regex>
+#include <stdio.h>
 #include <string>
 #include <vector>
-#include <algorithm>
-#include <stdio.h>
-#include <regex>
 
-using std::string;
-using std::vector;
 using std::regex;
 using std::regex_replace;
+using std::string;
+using std::vector;
 
-#include "../common/utils.hpp"
 #include "../common/ConfigEmu.hpp"
-#include "../common/db_cache.hpp"
 #include "../common/GameJsonEntry.hpp"
+#include "../common/db_cache.hpp"
+#include "../common/utils.hpp"
 #include "../kbinput/keyboard.hpp"
 
 #define PROXY_PATH "../../.tmp_update/proxy.sh"
 #define PROXY_RE "\\.\\.\\/\\.\\.\\/.*?\\/proxy\\.sh"
 #define ACTIVE_FILTER(emu_path) emu_path + "/active_filter"
 
-#define SCRIPT_FILTER "#!/bin/sh\ncd /mnt/SDCARD/.tmp_update; ./bin/filter filter \"$2\""
-#define SCRIPT_CLEAR_FILTER "#!/bin/sh\ncd /mnt/SDCARD/.tmp_update; ./bin/filter clear_filter \"$2\""
-#define SCRIPT_REFRESH "#!/bin/sh\ncd /mnt/SDCARD/.tmp_update; ./bin/filter refresh \"$2\""
+#define SCRIPT_FILTER                                                          \
+    "#!/bin/sh\ncd /mnt/SDCARD/.tmp_update; ./bin/filter filter \"$2\""
+#define SCRIPT_CLEAR_FILTER                                                    \
+    "#!/bin/sh\ncd /mnt/SDCARD/.tmp_update; ./bin/filter clear_filter \"$2\""
+#define SCRIPT_REFRESH                                                         \
+    "#!/bin/sh\ncd /mnt/SDCARD/.tmp_update; ./bin/filter refresh \"$2\""
 
 string commandPath(string path, string cmd)
 {
@@ -37,18 +40,15 @@ string cachePath(ConfigEmu config)
     return rom_path + "/" + basename(rom_path) + "_cache2.db";
 }
 
-void addCommand(sqlite3* db, string name, string path, string cmd, string disp = "")
+void addCommand(sqlite3 *db, string name, string path, string cmd,
+                string disp = "")
 {
-    db::insertRom(db, name, {
-        .disp = disp.length() > 0 ? disp : "~" + cmd,
-        .path = commandPath(path, cmd)
-    });
+    db::insertRom(db, name,
+                  {.disp = disp.length() > 0 ? disp : "~" + cmd,
+                   .path = commandPath(path, cmd)});
 }
 
-int remove(const string &file_path)
-{
-    return remove(file_path.c_str());
-}
+int remove(const string &file_path) { return remove(file_path.c_str()); }
 
 void patchGamelist(string path)
 {
@@ -84,10 +84,13 @@ void installFilter(void)
 
     for (auto &config : configs) {
         // Only patch configs we can restore, and not already patched
-        if (config.launch == "launch.sh" && config.launch != PROXY_PATH) {
+        if (config.launch == "launch.sh") {
             config.launch = PROXY_PATH;
-            if (config.extlist != "")
+
+            if (config.extlist != "" &&
+                config.extlist.find("miyoocmd") == std::string::npos)
                 config.extlist += "|miyoocmd";
+
             config.save();
         }
 
@@ -99,7 +102,7 @@ void installFilter(void)
             putFile(commandPath(full_path, "Refresh roms"), SCRIPT_REFRESH);
         }
 
-        sqlite3* db;
+        sqlite3 *db;
         string name = basename(config.rompath);
         string cache_path = cachePath(config);
 
@@ -132,16 +135,12 @@ void uninstallFilter(void)
         if (config.launch == PROXY_PATH)
             config.launch = "launch.sh";
 
-        vector<string> extlist = split(config.extlist, "|");
-        config.extlist = join(removeValue<string>(extlist, "miyoocmd"), "|");
-        config.save();
-
         string full_path = dirname(config.path) + "/" + config.rompath;
         remove(commandPath(full_path, "Filter"));
         remove(commandPath(full_path, "Clear filter"));
         remove(commandPath(full_path, "Refresh roms"));
 
-        sqlite3* db;
+        sqlite3 *db;
         string name = basename(config.rompath);
         string cache_path = cachePath(config);
 
@@ -183,7 +182,7 @@ void clearFilter(string emu_path)
     string name = basename(config.rompath);
     string cache_path = cachePath(config);
 
-    sqlite3* db;
+    sqlite3 *db;
 
     if (!db::open(&db, cache_path)) {
         remove(cache_path);
@@ -203,7 +202,7 @@ void clearFilter(string emu_path)
     sqlite3_close(db);
 }
 
-void applyFilter(Display* display, string emu_path)
+void applyFilter(Display *display, string emu_path)
 {
     string keyword = getFile(ACTIVE_FILTER(emu_path));
     int ec = 0;
@@ -219,15 +218,13 @@ void applyFilter(Display* display, string emu_path)
         return;
     }
 
-    SDL_Surface* filter_icon = IMG_Load("res/icon_filter.png");
+    SDL_Surface *filter_icon = IMG_Load("res/icon_filter.png");
     display->clear();
-    display->blit(filter_icon, {
-        320 - filter_icon->w / 2,
-        150 - filter_icon->h / 2,
-        filter_icon->w,
-        filter_icon->h
-    });
-    display->centerText("Applying filter...", {320, 240}, display->fonts.display);
+    display->blit(filter_icon,
+                  {320 - filter_icon->w / 2, 150 - filter_icon->h / 2,
+                   filter_icon->w, filter_icon->h});
+    display->centerText("Applying filter...", {320, 240},
+                        display->fonts.display);
     display->flip();
     SDL_FreeSurface(filter_icon);
     filter_icon = NULL;
@@ -241,7 +238,7 @@ void applyFilter(Display* display, string emu_path)
     string name = basename(config.rompath);
     string cache_path = cachePath(config);
 
-    sqlite3* db;
+    sqlite3 *db;
 
     if (!db::open(&db, cache_path)) {
         remove(cache_path);
@@ -256,7 +253,7 @@ void applyFilter(Display* display, string emu_path)
     addCommand(db, name, full_path, "Filter", "~Filter: " + keyword);
     addCommand(db, name, full_path, "Clear filter");
     addCommand(db, name, full_path, "Refresh roms");
-    
+
     putFile(commandPath(full_path, "Clear filter"), SCRIPT_CLEAR_FILTER);
 
     int total_lines = db::countRootEntries(db, name);
