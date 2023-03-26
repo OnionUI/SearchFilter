@@ -83,14 +83,10 @@ void installFilter(void)
     vector<ConfigEmu> configs = getEmulatorConfigs();
 
     for (auto &config : configs) {
-        // Only patch configs we can restore, and not already patched
-        if (config.launch == "launch.sh") {
-            config.launch = PROXY_PATH;
-
-            if (config.extlist != "" &&
-                config.extlist.find("miyoocmd") == std::string::npos)
-                config.extlist += "|miyoocmd";
-
+        // Add miyoocmd to extlist if necessary
+        if (config.extlist != "" &&
+            config.extlist.find("miyoocmd") == std::string::npos) {
+            config.extlist += "|miyoocmd";
             config.save();
         }
 
@@ -120,10 +116,6 @@ void installFilter(void)
     unpatchGamelist(FAVORITES_PATH);
     unpatchGamelist(RECENTLIST_PATH);
     unpatchGamelist(RECENTLIST_HIDDEN_PATH);
-
-    patchGamelist(FAVORITES_PATH);
-    patchGamelist(RECENTLIST_PATH);
-    patchGamelist(RECENTLIST_HIDDEN_PATH);
 }
 
 void uninstallFilter(void)
