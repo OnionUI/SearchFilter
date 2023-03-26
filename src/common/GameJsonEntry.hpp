@@ -3,9 +3,11 @@
 
 #include <string>
 #include <fstream>
+#include <regex>
 #include <vector>
 #include <json/json.h>
 
+using std::regex;
 using std::string;
 using std::to_string;
 using std::getline;
@@ -17,6 +19,7 @@ using std::vector;
 #define RECENTLIST_PATH "/mnt/SDCARD/Roms/recentlist.json"
 #define RECENTLIST_HIDDEN_PATH "/mnt/SDCARD/Roms/recentlist-hidden.json"
 #define FAVORITES_PATH "/mnt/SDCARD/Roms/favourite.json"
+#define PROXY_RE "\\.\\.\\/\\.\\.\\/.*?\\/proxy\\.sh"
 
 struct GameJsonEntry
 {
@@ -60,9 +63,12 @@ struct GameJsonEntry
             entry.rompath = tokens[1];
         }
 
+        regex re("^(\\/mnt\\/SDCARD\\/Emu\\/[^\\/]*?\\/)(" PROXY_RE ")$");
+        entry.launch = regex_replace(entry.launch, re, "$1launch.sh");
+
         int pos;
-        if ((pos = findNth(entry.rompath, "/", 4)) != std::string::npos)
-            entry.emupath = entry.rompath.substr(0, pos);
+        if ((pos = findNth(entry.launch, "/", 4)) != std::string::npos)
+            entry.emupath = entry.launch.substr(0, pos);
 
         return entry;
     }

@@ -28,14 +28,23 @@ int main(int argc, char** argv)
         return 0;
     }
 
-    if (argc >= 3 && string(argv[1]) == "setstate") {
+    if (argc >= 4 && string(argv[1]) == "setstate") {
         string label = string(argv[2]);
+        string emupath = string(argv[3]);
+        bool is_expert = dirname(emupath) == "/mnt/SDCARD/RApp";
+        int emu_type = is_expert ? 17 : 5;
+        string name_type = is_expert ? "raname" : "emuname";
+
         std::cout << "label = " << label << std::endl;
+        
         vector<string> state_json = split(getFile("/tmp/state.json"), "]");
         stringstream ss;
+        
         ss << state_json[0];
-        ss << ",{\"title\":-1,\"type\":5,\"currpos\":0,\"pagestart\":0,\"pageend\":5,\"emuname\":\"" << label << "\"}]}";
+        ss << ",{\"title\":-1,\"type\":" << emu_type << ",\"currpos\":0,\"pagestart\":0,\"pageend\":5,\"" << name_type << "\":\"" << label << "\"}]}";
+        
         std::cout << "state = " << ss.str() << std::endl;
+        
         putFile("/tmp/state.json", ss.str());
         return 0;
     }

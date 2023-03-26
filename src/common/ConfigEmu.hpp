@@ -6,17 +6,19 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 using std::string;
 using std::to_string;
 using std::vector;
 using std::ifstream;
+using std::unordered_map;
 
 #include "utils.hpp"
 
 #define IGNORED_EMU "SEARCH"
 #define EMU_PATH "/mnt/SDCARD/Emu"
-#define CONFIG_PATH(name) EMU_PATH "/" + name + "/config.json"
+#define RAPP_PATH "/mnt/SDCARD/RApp"
 
 struct ConfigEmu
 {
@@ -129,10 +131,8 @@ struct ConfigEmu
 vector<ConfigEmu> getEmulatorConfigs(void)
 {
     vector<ConfigEmu> configs;
-    int index = 0;
-
-    subdirForEach(EMU_PATH, [&configs, &index](string name) {
-        string config_path = CONFIG_PATH(name);
+    auto iter = [&configs](string name, string path) {
+        string config_path = path + "/" + name + "/config.json";
 
         if (name == IGNORED_EMU)
             return;
@@ -140,8 +140,11 @@ vector<ConfigEmu> getEmulatorConfigs(void)
         if (!exists(config_path))
             return;
 
-        configs.push_back(ConfigEmu::load(config_path, index++));
-    });
+        configs.push_back(ConfigEmu::load(config_path));
+    };
+
+    subdirForEach(EMU_PATH, iter);
+    subdirForEach(RAPP_PATH, iter);
 
     return configs;
 }

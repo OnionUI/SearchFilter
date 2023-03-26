@@ -24,8 +24,9 @@ echo "launch mode:" $mode
 if [ "$mode" = "noop" ]; then
     echo noop >> $progdir/debug.log
 elif [ "${mode:0:8}" = "setstate" ]; then
-    label="${mode:9}"
-    ./bin/search setstate "$label"
+    emupath=`echo "$mode" | awk '{ st=index($0,":"); $0=substr($0,st+1); end=index($0,":"); print substr($0,0,end-1) }'`
+    label=`echo "$mode" | awk '{ st=index($0,":"); $0=substr($0,st+1); end=index($0,":"); print substr($0,end+1) }'`
+    ./bin/search setstate "$label" "$emupath"
 elif [ "$mode" = "clear" ]; then
     ./bin/search clear
 elif [ "$mode" = "search" ]; then

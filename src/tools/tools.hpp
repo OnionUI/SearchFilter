@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <json/json.h>
 #include <unordered_map>
+#include <dirent.h>
 
 using std::sort;
 using std::any_of;
@@ -26,25 +27,34 @@ namespace tools {
 void fixFavorites(void)
 {
     vector<GameJsonEntry> favorites = loadGameJsonEntries(FAVORITES_PATH);
-    unordered_map<string, ConfigEmu> emu_configs;
     vector<string> added_rompaths;
     vector<string> added_labels;
     string contents = "";
 
+    vector<string> emu_labels;
+    unordered_map<string, ConfigEmu> emu_configs_lookup;
+
+    for (auto &config : getEmulatorConfigs()) {
+        emu_labels.push_back(config.label);
+        emu_configs_lookup[dirname(config.path)] = config;
+    }
+
     for (auto &entry : favorites) {
-        if (emu_configs.find(entry.emupath) == emu_configs.end())
-            emu_configs[entry.emupath] = getEmulatorConfig(entry.emupath);
+        string emuname = basename(entry.emupath);
+
+        if (emu_configs_lookup.find(entry.emupath) == emu_configs_lookup.end())
+            continue;
 
         string romname = removeExtension(basename(entry.rompath));
 
-        entry.label = romname;
+        if (std::count(emu_labels.begin(), emu_labels.end(), entry.label) != 0)
+            entry.label = romname;
 
         string imgpath = entry.emupath + "/";
-        if (emu_configs[entry.emupath].imgpath.length() > 0)
-            imgpath += emu_configs[entry.emupath].imgpath + "/";
+        if (emu_configs_lookup[entry.emupath].imgpath.length() > 0)
+            imgpath += emu_configs_lookup[entry.emupath].imgpath + "/";
         imgpath += romname + ".png";
         entry.imgpath = imgpath;
-
 
         if (std::count(added_rompaths.begin(), added_rompaths.end(), entry.rompath) == 0) {
             int num = 1;
@@ -60,6 +70,7 @@ void fixFavorites(void)
         }
     }
 
+    copyFile(FAVORITES_PATH, "/mnt/SDCARD/Roms/favfix-backup.json");
     putFile(FAVORITES_PATH, contents);
 }
 

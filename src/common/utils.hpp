@@ -264,7 +264,7 @@ bool dirEmpty(string path) {
     return true;
 }
 
-void subdirForEach(string path, function<void(string)> callback) {
+void subdirForEach(string path, function<void(string,string)> callback) {
     DIR* dirFile = opendir(path.c_str());
 
     if (!dirFile)
@@ -287,7 +287,7 @@ void subdirForEach(string path, function<void(string)> callback) {
         // Ignore empty directories
         if (dirEmpty(path + "/" + name)) continue;
 
-        callback(name);
+        callback(name, path);
     }
 
     closedir(dirFile);

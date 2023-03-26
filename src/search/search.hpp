@@ -140,6 +140,9 @@ void performSearch(Display* display, string keyword)
             // Use rom folder name if no label exist
             label = basename(config.rompath);
 
+        if (dirname(emu_path) == "/mnt/SDCARD/RApp")
+            label += " [Expert]";
+
         if (!exists(cache_path)) {
             missing_caches.push_back(config);
             continue;
@@ -215,9 +218,14 @@ void performSearch(Display* display, string keyword)
         total_lines++;
 
         for (auto &config : missing_caches) {
+            string emu_path = dirname(config.path);
+            string label = trim(config.label);
+            if (dirname(emu_path) == "/mnt/SDCARD/RApp")
+                label += " [Expert]";
+
             db::insertRom(db, DB_NAME, {
-                .disp = trim(config.label),
-                .path = "setstate " + config.label,
+                .disp = label,
+                .path = "setstate:" + emu_path + ":" + config.label,
                 .imgpath = "/mnt/SDCARD/.tmp_update/res/help_unavailable.png",
                 .type = 0,
                 .ppath = cache_missing_label
