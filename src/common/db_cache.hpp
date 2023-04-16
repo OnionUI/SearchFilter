@@ -116,8 +116,8 @@ string create_roms_table(string name)
 
 string insert(string name, RomEntry entry)
 {
-    string sql = "INSERT INTO %Q (disp, path, imgpath, type, ppath, pinyin) "
-                 "VALUES (%Q, %Q, %Q, %q, %Q, %Q);";
+    string sql = "INSERT INTO %Q (disp, path, imgpath, type, ppath, pinyin, cpinyin) "
+                 "VALUES (%Q, %Q, %Q, %q, %Q, %Q, '');";
     string table = TABLE_NAME(name);
     return string(
         sqlite3_mprintf(sql.c_str(), table.c_str(), entry.label.c_str(),
@@ -127,8 +127,8 @@ string insert(string name, RomEntry entry)
 
 string dupChangePpath(string name, string ppath)
 {
-    string sql = "INSERT INTO %Q (disp, path, imgpath, type, ppath, pinyin) "
-                 "SELECT disp, path, imgpath, type, %Q, pinyin FROM %Q WHERE type=0 "
+    string sql = "INSERT INTO %Q (disp, path, imgpath, type, ppath, pinyin, cpinyin) "
+                 "SELECT disp, path, imgpath, type, %Q, pinyin, cpinyin FROM %Q WHERE type=0 "
                  "AND path!='nocache';";
     string table = TABLE_NAME(name);
     return string(sqlite3_mprintf(sql.c_str(), table.c_str(), ppath.c_str(),
