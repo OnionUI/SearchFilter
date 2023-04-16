@@ -19,11 +19,11 @@ using std::vector;
 
 #include "utils.hpp"
 
-#define CACHE_NAME(name) name + "_cache2.db"
+#define CACHE_NAME(name) name + "_cache6.db"
 #define TABLE_NAME(name) name + "_roms"
 
 struct RomEntry {
-    string disp = "";
+    string label = "";
     string path = "";
     string imgpath = "";
     int type = 0;
@@ -31,7 +31,7 @@ struct RomEntry {
 
     RomEntry changePpath(string _ppath)
     {
-        return {.disp = disp,
+        return {.label = label,
                 .path = path,
                 .imgpath = imgpath,
                 .type = type,
@@ -54,7 +54,7 @@ string search(string table, const string &keyword_str)
         string keyword = trim(keywords[i]);
         if (keyword.length() == 0)
             continue;
-        sql += sqlite3_mprintf(" AND disp LIKE '%%%q%%'", keyword.c_str());
+        sql += sqlite3_mprintf(" AND pinyin LIKE '%%%q%%'", keyword.c_str());
         first = false;
     }
 
@@ -107,26 +107,28 @@ string create_roms_table(string name)
                  "path TEXT NOT NULL,"
                  "imgpath TEXT NOT NULL,"
                  "type INTEGER DEFAULT 0,"
-                 "ppath TEXT NOT NULL)";
+                 "ppath TEXT NOT NULL,"
+                 "pinyin TEXT NOT NULL,"
+                 "cpinyin TEXT NOT NULL)";
     string table = TABLE_NAME(name);
     return string(sqlite3_mprintf(sql.c_str(), table.c_str()));
 }
 
 string insert(string name, RomEntry entry)
 {
-    string sql = "INSERT INTO %Q (disp, path, imgpath, type, ppath) "
-                 "VALUES (%Q, %Q, %Q, %q, %Q);";
+    string sql = "INSERT INTO %Q (disp, path, imgpath, type, ppath, pinyin) "
+                 "VALUES (%Q, %Q, %Q, %q, %Q, %Q);";
     string table = TABLE_NAME(name);
     return string(
-        sqlite3_mprintf(sql.c_str(), table.c_str(), entry.disp.c_str(),
+        sqlite3_mprintf(sql.c_str(), table.c_str(), entry.label.c_str(),
                         entry.path.c_str(), entry.imgpath.c_str(),
-                        to_string(entry.type).c_str(), entry.ppath.c_str()));
+                        to_string(entry.type).c_str(), entry.ppath.c_str(), entry.label.c_str()));
 }
 
 string dupChangePpath(string name, string ppath)
 {
-    string sql = "INSERT INTO %Q (disp, path, imgpath, type, ppath) "
-                 "SELECT disp, path, imgpath, type, %Q FROM %Q WHERE type=0 "
+    string sql = "INSERT INTO %Q (disp, path, imgpath, type, ppath, pinyin) "
+                 "SELECT disp, path, imgpath, type, %Q, pinyin FROM %Q WHERE type=0 "
                  "AND path!='nocache';";
     string table = TABLE_NAME(name);
     return string(sqlite3_mprintf(sql.c_str(), table.c_str(), ppath.c_str(),
@@ -266,7 +268,7 @@ vector<RomEntry> searchEntries(string path, string keyword)
     // Execute row count query
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
         RomEntry entry = {
-            .disp = string((char *)sqlite3_column_text(stmt, 1)),
+            .label = string((char *)sqlite3_column_text(stmt, 1)),
             .path = string((char *)sqlite3_column_text(stmt, 2)),
             .imgpath = string((char *)sqlite3_column_text(stmt, 3)),
             .type = sqlite3_column_int(stmt, 4),
@@ -323,7 +325,7 @@ int countRootEntries(sqlite3 *db, string name)
 void addEmptyLines(sqlite3 *db, string name, int &total_lines)
 {
     for (; total_lines < 6; total_lines++)
-        insertRom(db, name, {.disp = "~", .path = "noop.miyoocmd"});
+        insertRom(db, name, {.label = "~", .path = "noop.miyoocmd"});
 }
 
 } // namespace db

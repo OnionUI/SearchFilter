@@ -37,14 +37,14 @@ string commandPath(string path, string cmd)
 string cachePath(ConfigEmu config)
 {
     string rom_path = fullpath(dirname(config.path), config.rompath);
-    return rom_path + "/" + basename(rom_path) + "_cache2.db";
+    return rom_path + "/" + basename(rom_path) + "_cache6.db";
 }
 
 void addCommand(sqlite3 *db, string name, string path, string cmd,
-                string disp = "")
+                string label = "")
 {
     db::insertRom(db, name,
-                  {.disp = disp.length() > 0 ? disp : "~" + cmd,
+                  {.label = label.length() > 0 ? label : "~" + cmd,
                    .path = commandPath(path, cmd)});
 }
 

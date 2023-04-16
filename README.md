@@ -14,7 +14,7 @@ This app adds *Search* to the *Consoles* section and an optional *Filter* functi
 
 **Note:** When the roms are refreshed, the console lists will no longer be cached, and will not be included in the search. To include them, just visit the given console list and it will be scanned and cached.
 
-> **Tip:** Instead of choosing "refresh roms" after adding a new rom, simply delete the `*_cache2.db` file inside the rom folder - now you'll only need to visit one console list! This is made even easier with the `Install filter` tool, which adds a `Refresh roms` shortcut to the bottom of each console list, which will only delete the corresponding cache.
+> **Tip:** Instead of choosing "refresh roms" after adding a new rom, simply delete the `*_cache6.db` file inside the rom folder - now you'll only need to visit one console list! This is made even easier with the `Install filter` tool, which adds a `Refresh roms` shortcut to the bottom of each console list, which will only delete the corresponding cache.
 
 
 ### Tools

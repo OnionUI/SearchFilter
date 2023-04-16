@@ -45,17 +45,17 @@ void updateDisplay(Display *display, string msg, string submsg = "")
 void addTools(sqlite3* db)
 {
     db::insertRom(db, DB_NAME, {
-        .disp = "~Tools",
+        .label = "~Tools",
         .path = "",
         .imgpath = "",
         .type = 1
     });
 
-    auto addTool = [db](string disp, string cmd) {
+    auto addTool = [db](string label, string cmd) {
         db::insertRom(db, DB_NAME, {
-            .disp = disp,
+            .label = label,
             .path = cmd,
-            .imgpath = DB_DIR + "/Imgs/" + disp + ".png",
+            .imgpath = DB_DIR + "/Imgs/" + label + ".png",
             .type = 0,
             .ppath = "~Tools"
         });
@@ -98,7 +98,7 @@ void performSearch(Display* display, string keyword)
 
     if (keyword.length() == 0) {
         db::insertRom(db, DB_NAME, {
-            .disp = "Enter search term...",
+            .label = "Enter search term...",
             .path = "search",
             .imgpath = DB_DIR + "/Imgs/Enter search term....png"
         });
@@ -161,7 +161,7 @@ void performSearch(Display* display, string keyword)
         updateDisplay(display, status_main, status_sub);
 
         db::insertRom(db, DB_NAME, {
-            .disp = label,
+            .label = label,
             .path = rom_path,
             .imgpath = rom_path,
             .type = 1
@@ -171,7 +171,7 @@ void performSearch(Display* display, string keyword)
         for (auto &entry : result) {
             string path = launch_cmd + ":" + entry.path;
             db::insertRom(db, DB_NAME, {
-                .disp = entry.disp,
+                .label = entry.label,
                 .path = path,
                 .imgpath = entry.imgpath,
                 .type = 0,
@@ -185,7 +185,7 @@ void performSearch(Display* display, string keyword)
     string all_label = "All systems (" + to_string(total) + ")";
 
     db::insertRom(db, DB_NAME, {
-        .disp = all_label,
+        .label = all_label,
         .path = "",
         .imgpath = "",
         .type = 1
@@ -194,7 +194,7 @@ void performSearch(Display* display, string keyword)
 
     if (total == 0) {
         db::insertRom(db, DB_NAME, {
-            .disp = "No results",
+            .label = "No results",
             .path = "clear",
             .imgpath = "/mnt/SDCARD/.tmp_update/res/help_clear_search.png",
             .type = 0,
@@ -210,7 +210,7 @@ void performSearch(Display* display, string keyword)
         string cache_missing_label = "~Missing caches (" + to_string(missing_caches.size()) + ")";
 
         db::insertRom(db, DB_NAME, {
-            .disp = cache_missing_label,
+            .label = cache_missing_label,
             .path = "",
             .imgpath = "",
             .type = 1
@@ -224,7 +224,7 @@ void performSearch(Display* display, string keyword)
                 label += " [Expert]";
 
             db::insertRom(db, DB_NAME, {
-                .disp = label,
+                .label = label,
                 .path = "setstate:" + emu_path + ":" + config.label,
                 .imgpath = "/mnt/SDCARD/.tmp_update/res/help_unavailable.png",
                 .type = 0,
@@ -237,14 +237,14 @@ void performSearch(Display* display, string keyword)
     total_lines++;
 
     db::insertRom(db, DB_NAME, {
-        .disp = "Clear search",
+        .label = "Clear search",
         .path = "clear",
         .imgpath = "/mnt/SDCARD/.tmp_update/res/help_clear_search.png"
     });
     total_lines++;
 
     db::insertRom(db, DB_NAME, {
-        .disp = "Search: " + keyword,
+        .label = "Search: " + keyword,
         .path = "search",
         .imgpath = DB_DIR + "/Imgs/Enter search term....png"
     });
