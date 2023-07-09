@@ -1,33 +1,35 @@
 #ifndef TOOLS_HPP__
 #define TOOLS_HPP__
 
-#include <string>
-#include <vector>
 #include <algorithm>
-#include <json/json.h>
-#include <unordered_map>
 #include <dirent.h>
+#include <json/json.h>
+#include <stdlib.h>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
-using std::sort;
 using std::any_of;
-using std::string;
-using std::vector;
-using std::unordered_map;
 using std::count;
+using std::sort;
+using std::string;
+using std::unordered_map;
+using std::vector;
 
-#include "../common/utils.hpp"
-#include "../common/GameJsonEntry.hpp"
 #include "../common/ConfigEmu.hpp"
+#include "../common/GameJsonEntry.hpp"
+#include "../common/utils.hpp"
 
 #define APP_ROOT "/mnt/SDCARD/Emu/SEARCH/../../App/Search"
 #define LAUNCH_PATH APP_ROOT "/launch.sh"
+#define TEMP_FAV_FILE "/tmp/__favfix_favourite.json"
 
 namespace tools {
 
 void fixFavorites(void)
 {
     vector<GameJsonEntry> favorites = loadGameJsonEntries(FAVORITES_PATH);
-    vector<string> added_rompaths;
+    vector<string> added_paths;
     vector<string> added_labels;
     string contents = "";
 
@@ -45,33 +47,37 @@ void fixFavorites(void)
         if (emu_configs_lookup.find(entry.emupath) == emu_configs_lookup.end())
             continue;
 
-        string romname = removeExtension(basename(entry.rompath));
+        char actual_path[PATH_MAX + 1];
+        realpath(entry.rompath.c_str(), actual_path);
+        string abs_path(actual_path);
 
-        if (std::count(emu_labels.begin(), emu_labels.end(), entry.label) != 0)
-            entry.label = romname;
+        if (std::count(added_paths.begin(), added_paths.end(), abs_path) == 0) {
+            string romname = removeExtension(basename(entry.rompath));
 
-        string imgpath = entry.emupath + "/";
-        if (emu_configs_lookup[entry.emupath].imgpath.length() > 0)
-            imgpath += emu_configs_lookup[entry.emupath].imgpath + "/";
-        imgpath += romname + ".png";
-        entry.imgpath = imgpath;
+            if (std::count(emu_labels.begin(), emu_labels.end(), entry.label) != 0)
+                entry.label = romname;
 
-        if (std::count(added_rompaths.begin(), added_rompaths.end(), entry.rompath) == 0) {
-            int num = 1;
-            string label = entry.label;
-            while (std::count(added_labels.begin(), added_labels.end(), label) != 0)
-                label = entry.label + " (" + to_string(++num) + ")";
-            if (num > 1)
-                entry.label = label;
-            added_labels.push_back(entry.label);
-            added_rompaths.push_back(entry.rompath);
-            std::cout << entry.label << ": " << imgpath << std::endl;
+            if (emu_configs_lookup[entry.emupath].imgpath.length() > 0) {
+                entry.imgpath = entry.emupath + "/" + emu_configs_lookup[entry.emupath].imgpath + "/" + romname + ".png";
+            }
+
+            added_paths.push_back(abs_path);
             contents += entry.toJson() + "\n";
+        }
+        else {
+            std::cout << "Removed duplicate: " << abs_path << std::endl;
         }
     }
 
-    copyFile(FAVORITES_PATH, "/mnt/SDCARD/Roms/favfix-backup.json");
-    putFile(FAVORITES_PATH, contents);
+    string prev_contents = getFile(FAVORITES_PATH) + "\n";
+
+    if (contents.compare(prev_contents) != 0) {
+        putFile(FAVORITES_PATH, contents);
+        std::cout << "Favorites file was modified" << std::endl;
+    }
+    else {
+        std::cout << "Favorites file was not modified" << std::endl;
+    }
 }
 
 void sortFavorites(bool (*sort_function)(GameJsonEntry, GameJsonEntry) = NULL)
@@ -106,14 +112,15 @@ void sortFavoritesBySystem(void)
     });
 }
 
-void addShortcut(vector<GameJsonEntry>* favorites, string label, string cmd)
+void addShortcut(vector<GameJsonEntry> *favorites, string label, string cmd)
 {
-    auto hasShortcut = [cmd](GameJsonEntry entry){
+    auto hasShortcut = [cmd](GameJsonEntry entry) {
         return entry.rompath == cmd;
     };
     if (any_of(favorites->begin(), favorites->end(), hasShortcut))
         return;
-    favorites->push_back({label, LAUNCH_PATH, 5, APP_ROOT "/data/~Tools/" + cmd + ".miyoocmd"});
+    favorites->push_back(
+        {label, LAUNCH_PATH, 5, APP_ROOT "/data/~Tools/" + cmd + ".miyoocmd"});
 }
 
 void addFavoritesTools(void)
@@ -145,7 +152,9 @@ void cleanRecentList(string recentlist_path, bool clean_all)
             entry.launch = tokens[0];
             entry.rompath = tokens[1];
         }
-        else if (entry.launch == LAUNCH_PATH || getExtension(entry.rompath) == "miyoocmd" || (clean_all && entry.type == 3)) {
+        else if (entry.launch == LAUNCH_PATH ||
+                 getExtension(entry.rompath) == "miyoocmd" ||
+                 (clean_all && entry.type == 3)) {
             continue;
         }
         contents += entry.toJson() + "\n";
