@@ -7,7 +7,18 @@ RELEASE_NAME=$(TARGET)-$(VERSION)
 ROOT_DIR := $(shell pwd -P)
 BUILD_DIR := $(ROOT_DIR)/build/.tmp_update/bin
 LIB_DIR := $(ROOT_DIR)/build/.tmp_update/lib
-TOOLCHAIN := ghcr.io/onionui/miyoomini-toolchain
+TOOLCHAIN := aemiii91/miyoomini-toolchain:latest
+
+ifdef OS
+	current_dir := $(shell cd)
+	ROOT_DIR := $(subst \,/,$(current_dir))
+	makedir := mkdir
+	createfile := echo.>
+else
+	ROOT_DIR := $(shell pwd)
+	makedir := mkdir -p
+	createfile := touch
+endif
 
 ###########################################################
 
@@ -44,6 +55,13 @@ clean:
 git-clean:
 	@git clean -xfd -e .vscode
 
-with-toolchain:
+cache/.docker:
 	docker pull $(TOOLCHAIN)
+	$(makedir) cache
+	$(createfile) cache/.docker
+
+toolchain: cache/.docker
+	docker run -it --rm -v "$(ROOT_DIR)":/root/workspace $(TOOLCHAIN) /bin/bash
+
+with-toolchain: cache/.docker
 	docker run --rm -v "$(ROOT_DIR)":/root/workspace $(TOOLCHAIN) /bin/bash -c "source /root/.bashrc; make $(CMD)"

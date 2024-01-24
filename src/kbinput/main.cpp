@@ -2,9 +2,9 @@
 #define VERSION ""
 #endif
 
+#include <cstring>
 #include <iostream>
 #include <string>
-#include <cstring>
 
 using std::string;
 
@@ -13,7 +13,9 @@ using std::string;
 #include "../common/display.hpp"
 #include "keyboard.hpp"
 
-int main(int argc, char** argv)
+extern "C" int keyboard(SDL_Surface *, SDL_Surface *, char *, char *, char *);
+
+int main(int argc, char **argv)
 {
     if (argc >= 2 && string(argv[1]) == "--version") {
         std::cout << VERSION;
@@ -39,8 +41,8 @@ int main(int argc, char** argv)
     }
 
     int quit = 0;
-    Display* display = new Display();
-    Keyboard* kb = new Keyboard(display, initial_value, title);
+    Display *display = new Display();
+    Keyboard *kb = new Keyboard(display, initial_value, title);
 
     auto input_handler = [&kb](SDLKey key, Uint8 type, int repeating) {
         return kb->handleKeyPress(key, type, repeating);
@@ -60,7 +62,36 @@ int main(int argc, char** argv)
         std::cout << "\n\nRESULT:" << std::endl;
         std::cout << kb->getValue() << std::endl;
     }
-    
+
+    delete kb;
+
+    return kb->cancelled;
+}
+
+int keyboard(SDL_Surface *video, SDL_Surface *screen, char *title, char *initial_value, char *out_value)
+{
+    int quit = 0;
+    Display *display = new Display(video, screen);
+    Keyboard *kb = new Keyboard(display, initial_value, title);
+
+    auto input_handler = [&kb](SDLKey key, Uint8 type, int repeating) {
+        return kb->handleKeyPress(key, type, repeating);
+    };
+
+    auto frame_handler = [display, input_handler](void) {
+        return display->onInputEvent(input_handler);
+    };
+
+    while (!quit) {
+        quit = display->requestFrame(frame_handler);
+    }
+
+    delete display;
+
+    if (!kb->cancelled) {
+        strncpy(out_value, kb->getValue().c_str(), 256);
+    }
+
     delete kb;
 
     return kb->cancelled;

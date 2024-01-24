@@ -88,6 +88,7 @@ class Display {
     DisplayFonts fonts;
     Uint8 keystate[320] = {};
     SDLKey key_repeat = SDLK_FIRST;
+    bool sdl_control = true;
 
     Display()
     {
@@ -96,25 +97,42 @@ class Display {
         SDL_EnableKeyRepeat(300, 50);
         TTF_Init();
 
-        video = SDL_SetVideoMode(640, 480, 32, SDL_HWSURFACE);
-        screen = SDL_CreateRGBSurface(SDL_HWSURFACE, 640, 480, 32, 0, 0, 0, 0);
+        this->video = SDL_SetVideoMode(640, 480, 32, SDL_HWSURFACE);
+        this->screen = SDL_CreateRGBSurface(SDL_HWSURFACE, 640, 480, 32, 0, 0, 0, 0);
 
-        fonts = {
-            .display = TTF_OpenFont(MAIN_FONT, 40),
-            .regular = TTF_OpenFont(MAIN_FONT, 24),
-            .label = TTF_OpenFont(LABEL_FONT, 30)};
+        openFonts();
+    }
 
-        // std::cerr << "DISPLAY UP" << std::endl;
+    Display(SDL_Surface *video, SDL_Surface *screen)
+    {
+        this->video = video;
+        this->screen = screen;
+        this->sdl_control = false;
+        openFonts();
     }
 
     ~Display()
     {
+        closeFonts();
+        if (sdl_control) {
+            SDL_FreeSurface(screen);
+            SDL_Quit();
+        }
+    }
+
+    void openFonts(void)
+    {
+        this->fonts = {
+            .display = TTF_OpenFont(MAIN_FONT, 40),
+            .regular = TTF_OpenFont(MAIN_FONT, 24),
+            .label = TTF_OpenFont(LABEL_FONT, 30)};
+    }
+
+    void closeFonts(void)
+    {
         TTF_CloseFont(fonts.display);
         TTF_CloseFont(fonts.regular);
         TTF_CloseFont(fonts.label);
-        SDL_FreeSurface(screen);
-        SDL_Quit();
-        // std::cerr << "DISPLAY DOWN" << std::endl;
     }
 
     bool onInputEvent(std::function<bool(SDLKey, Uint8, int)> input_handler);
